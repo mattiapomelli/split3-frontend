@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 import React, { useState } from "react";
 
 import { Button } from "@components/basic/button";
@@ -24,7 +25,16 @@ const Home: NextPage = () => {
 
   return (
     <div>
-      <Button onClick={() => createRequest()}>Create request</Button>
+      <Button
+        onClick={() =>
+          createRequest({
+            amount: ethers.utils.parseUnits("0.01", 6).toString(),
+            receiverAddress: "0x0F45421E8DC47eF9edd8568a9D569b6fc7Aa7AC6",
+          })
+        }
+      >
+        Create request
+      </Button>
       {requestId && (
         <div>
           <h3>Request id: {requestId}</h3>

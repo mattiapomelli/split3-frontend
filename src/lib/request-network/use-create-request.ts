@@ -1,6 +1,5 @@
 import { Types, Utils } from "@requestnetwork/request-client.js";
 import { useMutation } from "@tanstack/react-query";
-import { ethers } from "ethers";
 import { useAccount } from "wagmi";
 
 import { getRequestClient } from "./client";
@@ -10,7 +9,7 @@ const network = "goerli";
 const tokenAddress = "0xBA62BCfcAaFc6622853cca2BE6Ac7d845BC0f2Dc"; // FAU on Goerli
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
-interface CreateRequestParameters {
+interface CreateRequestParams {
   payerAddress: string;
   receiverAddress: string;
   amount: string;
@@ -20,7 +19,7 @@ const getCreateRequestParameters = ({
   payerAddress,
   receiverAddress,
   amount,
-}: CreateRequestParameters): Types.ICreateRequestParameters => {
+}: CreateRequestParams): Types.ICreateRequestParameters => {
   return {
     requestInfo: {
       // The currency in which the request is denominated
@@ -84,13 +83,15 @@ export const useCreateRequest = (options?: UseCreateRequestOptions) => {
   const { address } = useAccount();
 
   return useMutation(
-    async () => {
+    async ({
+      amount,
+      receiverAddress,
+    }: Omit<CreateRequestParams, "payerAddress">) => {
       if (!address) throw new Error("No address");
 
-      const amount = ethers.utils.parseUnits("0.01", 6).toString();
       const requestCreateParameters = getCreateRequestParameters({
         payerAddress: address,
-        receiverAddress: "0x0F45421E8DC47eF9edd8568a9D569b6fc7Aa7AC6",
+        receiverAddress,
         amount,
       });
 
