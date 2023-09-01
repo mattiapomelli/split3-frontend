@@ -1,4 +1,4 @@
-import { hardhat, polygon, polygonMumbai } from "wagmi/chains";
+import { goerli, hardhat, polygon } from "wagmi/chains";
 
 import { env } from "env.mjs";
 
@@ -9,7 +9,8 @@ const getChain = () => {
     case "localhost":
       return hardhat;
     case "testnet":
-      return polygonMumbai;
+      return goerli;
+    // return polygonMumbai;
     case "mainnet":
       throw polygon;
     default:
