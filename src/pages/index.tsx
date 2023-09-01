@@ -15,17 +15,20 @@ const Home: NextPage = () => {
 
   console.log("Requests", requests);
 
-  const { mutate: createRequest } = useCreateRequest({
-    onSuccess(requestId) {
-      setRequestId(requestId);
-    },
-  });
+  const { mutate: createRequest, isLoading: isCreateLoading } =
+    useCreateRequest({
+      onSuccess(requestId) {
+        setRequestId(requestId);
+      },
+    });
 
-  const { mutate: payRequest } = usePayRequest();
+  const { mutate: payRequest, isLoading: isPayLoading } = usePayRequest();
 
   return (
     <div>
       <Button
+        loading={isCreateLoading}
+        disabled={isCreateLoading}
         onClick={() =>
           createRequest({
             amount: ethers.utils.parseUnits("0.01", 6).toString(),
@@ -38,7 +41,13 @@ const Home: NextPage = () => {
       {requestId && (
         <div>
           <h3>Request id: {requestId}</h3>
-          <Button onClick={() => payRequest({ requestId })}>Pay request</Button>
+          <Button
+            onClick={() => payRequest({ requestId })}
+            loading={isPayLoading}
+            disabled={isPayLoading}
+          >
+            Pay request
+          </Button>
         </div>
       )}
       <div className="mt-6">

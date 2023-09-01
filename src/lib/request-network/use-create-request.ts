@@ -63,7 +63,7 @@ const getCreateRequestParameters = ({
     // The contentData can contain anything.
     // Consider using rnf_invoice format from @requestnetwork/data-format
     contentData: {
-      reason: "Debt Settlement!",
+      reason: "Debt Settlement 2",
       // dueDate: "2023.06.16",
     },
 
@@ -96,6 +96,7 @@ export const useCreateRequest = (options?: UseCreateRequestOptions) => {
       });
 
       console.log("Creating request: ");
+
       const requestClient = getRequestClient();
       const request = await requestClient.createRequest(
         requestCreateParameters,

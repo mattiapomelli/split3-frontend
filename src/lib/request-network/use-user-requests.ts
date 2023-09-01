@@ -18,7 +18,14 @@ export const useUserRequests = () => {
         value: address,
       });
 
-      return requests.map((request) => request.getData());
+      const requestsData = requests.map((request) => request.getData());
+
+      return requestsData.sort((a, b) => {
+        const aDate = new Date(a.timestamp);
+        const bDate = new Date(b.timestamp);
+
+        return bDate.getTime() - aDate.getTime();
+      });
     },
     enabled: !!address,
   });
