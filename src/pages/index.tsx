@@ -11,7 +11,7 @@ import type { NextPage } from "next";
 const Home: NextPage = () => {
   const [requestId, setRequestId] = useState<string | null>(null);
 
-  const { data: requests } = useUserRequests();
+  const { data: requests, refetch } = useUserRequests();
 
   console.log("Requests", requests);
 
@@ -19,10 +19,15 @@ const Home: NextPage = () => {
     useCreateRequest({
       onSuccess(requestId) {
         setRequestId(requestId);
+        refetch();
       },
     });
 
-  const { mutate: payRequest, isLoading: isPayLoading } = usePayRequest();
+  const { mutate: payRequest, isLoading: isPayLoading } = usePayRequest({
+    onSuccess() {
+      refetch();
+    },
+  });
 
   return (
     <div>
@@ -31,7 +36,7 @@ const Home: NextPage = () => {
         disabled={isCreateLoading}
         onClick={() =>
           createRequest({
-            amount: ethers.utils.parseUnits("0.01", 6).toString(),
+            amount: ethers.utils.parseUnits("0.00000000000001").toString(),
             receiverAddress: "0x0F45421E8DC47eF9edd8568a9D569b6fc7Aa7AC6",
           })
         }

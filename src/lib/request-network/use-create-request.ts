@@ -4,8 +4,9 @@ import { useAccount } from "wagmi";
 
 import { getRequestClient } from "./client";
 
-const network = "goerli";
+// const network = "mumbai";
 // const tokenAddress = "0x0FA8781a83E46826621b3BC094Ea2A0212e71B23"; // USDC on Mumbai
+const network = "goerli";
 const tokenAddress = "0xBA62BCfcAaFc6622853cca2BE6Ac7d845BC0f2Dc"; // FAU on Goerli
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
@@ -63,7 +64,7 @@ const getCreateRequestParameters = ({
     // The contentData can contain anything.
     // Consider using rnf_invoice format from @requestnetwork/data-format
     contentData: {
-      reason: "Debt Settlement 2",
+      reason: "Debt Settlement Mumbai",
       // dueDate: "2023.06.16",
     },
 

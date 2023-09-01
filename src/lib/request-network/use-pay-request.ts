@@ -5,6 +5,7 @@ import {
   payRequest,
 } from "@requestnetwork/payment-processor";
 import { useMutation } from "@tanstack/react-query";
+import { providers } from "ethers";
 import { useAccount } from "wagmi";
 
 import { getRequestClient } from "./client";
@@ -26,9 +27,14 @@ export const usePayRequest = (options?: UsePayRequestOptions) => {
 
       console.log("Request data: ", requestData);
 
+      // @ts-ignore
+      const provider = new providers.Web3Provider(window.ethereum);
       const payerHasSufficientFunds = await hasSufficientFunds(
         requestData,
         address,
+        {
+          provider: provider,
+        },
       );
 
       console.log("Payer has sufficient funds: ", payerHasSufficientFunds);
@@ -36,6 +42,7 @@ export const usePayRequest = (options?: UsePayRequestOptions) => {
       const payerHasErc20Approval = await hasErc20Approval(
         requestData,
         address,
+        provider,
       );
       console.log("Payer has Erc20 approval: ", payerHasErc20Approval);
 
