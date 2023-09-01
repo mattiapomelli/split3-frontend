@@ -2,6 +2,7 @@ import "../styles/globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DefaultSeo } from "next-seo";
 import { ThemeProvider } from "next-themes";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
@@ -37,20 +38,24 @@ const client = createClient({
   persister: null,
 });
 
+const queryClient = new QueryClient();
+
 function MyApp({ Component, pageProps }: AppProps) {
   const getLayout =
     (Component as ExtendedPage).getLayout ||
     ((page) => <DefaultLayout>{page}</DefaultLayout>);
 
   return (
-    <WagmiConfig client={client}>
-      <RainbowKitProvider chains={chains}>
-        <ThemeProvider>
-          <DefaultSeo {...SEO} />
-          {getLayout(<Component {...pageProps} />)}
-        </ThemeProvider>
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <QueryClientProvider client={queryClient}>
+      <WagmiConfig client={client}>
+        <RainbowKitProvider chains={chains}>
+          <ThemeProvider>
+            <DefaultSeo {...SEO} />
+            {getLayout(<Component {...pageProps} />)}
+          </ThemeProvider>
+        </RainbowKitProvider>
+      </WagmiConfig>
+    </QueryClientProvider>
   );
 }
 

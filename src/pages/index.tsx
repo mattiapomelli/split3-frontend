@@ -7,9 +7,11 @@ import {
 import { RequestNetwork } from "@requestnetwork/request-client.js";
 import { Types, Utils } from "@requestnetwork/request-client.js";
 import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
+import { useQuery } from "@tanstack/react-query";
+import { ethers } from "ethers";
 import React, { useState } from "react";
 import { useAccount } from "wagmi";
-// import { alchemyProvider } from "wagmi/providers/alchemy";
+// import { alchemyProvider } from "wagmi/providers/alchemy"
 
 import { Button } from "@components/basic/button";
 // import { env } from "env.mjs";
@@ -17,7 +19,8 @@ import { Button } from "@components/basic/button";
 import type { NextPage } from "next";
 
 const network = "goerli";
-const tokenAddress = "0x0FA8781a83E46826621b3BC094Ea2A0212e71B23"; // USDC on Mumbai
+// const tokenAddress = "0x0FA8781a83E46826621b3BC094Ea2A0212e71B23"; // USDC on Mumbai
+const tokenAddress = "0xBA62BCfcAaFc6622853cca2BE6Ac7d845BC0f2Dc"; // FAU on Goerli
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 interface CreateRequestParameters {
@@ -74,7 +77,7 @@ const getCreateRequestParameters = ({
     // The contentData can contain anything.
     // Consider using rnf_invoice format from @requestnetwork/data-format
     contentData: {
-      reason: "Debt Settlement",
+      reason: "Debt Settlement!",
       // dueDate: "2023.06.16",
     },
 
@@ -90,40 +93,46 @@ const Home: NextPage = () => {
   const { address } = useAccount();
   const [requestId, setRequestId] = useState<string | null>(null);
 
-  const createRequest = async () => {
-    if (!address) return;
-
-    // let provider;
-    // if (process.env.WEB3_PROVIDER_URL === undefined) {
-    //   // Connect to Metamask and other injected wallets
-    //   provider = new providers.Web3Provider(window.ethereum);
-    // } else {
-    //   // Connect to your own Ethereum node or 3rd party node provider
-    //   provider = new providers.JsonRpcProvider(process.env.WEB3_PROVIDER_URL);
-    // }
-    // getDefaultProvider() won't work because it doesn't include a Signer.
-
-    // const provider = alchemyProvider({
-    //   apiKey: env.NEXT_PUBLIC_ALCHEMY_API_KEY,
-    // });
-    // const provider = new providers.JsonRpcProvider(
-    //   `https://polygon-mumbai.g.alchemy.com/v2/${env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
-    // );
+  const getRequestClient = () => {
     const provider = window.ethereum;
     const web3SignatureProvider = new Web3SignatureProvider(provider);
 
-    const requestClient = new RequestNetwork({
+    return new RequestNetwork({
       nodeConnectionConfig: {
         baseURL: "https://goerli.gateway.request.network/",
       },
       signatureProvider: web3SignatureProvider,
     });
+  };
 
+  const { data: requests } = useQuery({
+    queryKey: ["requests", address],
+    queryFn: async () => {
+      if (!address) throw new Error("No address");
+      const requestClient = getRequestClient();
+      const requests = await requestClient.fromIdentity({
+        type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
+        value: address,
+      });
+      return requests.map((request) => request.getData());
+    },
+    enabled: !!address,
+  });
+
+  console.log("Requests", requests);
+
+  const createRequest = async () => {
+    if (!address) return;
+    const requestClient = getRequestClient();
+
+    const amount = ethers.utils.parseUnits("0.01", 6).toString();
     const requestCreateParameters = getCreateRequestParameters({
       payerAddress: address,
       receiverAddress: "0x0F45421E8DC47eF9edd8568a9D569b6fc7Aa7AC6",
-      amount: "1000000000000000000",
+      amount,
     });
+
+    console.log("Creating request: ");
     const request = await requestClient.createRequest(requestCreateParameters);
 
     setRequestId(request.requestId);
@@ -134,23 +143,12 @@ const Home: NextPage = () => {
   const onPayRequest = async (requestId: string) => {
     if (!address) return;
 
-    // const provider = window.ethereum;
-    // const web3SignatureProvider = new Web3SignatureProvider(provider);
-
-    const requestClient = new RequestNetwork({
-      nodeConnectionConfig: {
-        baseURL: "https://goerli.gateway.request.network/",
-      },
-      // signatureProvider: web3SignatureProvider,
-    });
-
+    const requestClient = getRequestClient();
     const request = await requestClient.fromRequestId(requestId);
     const requestData = request.getData();
 
     console.log("Request data: ", requestData);
 
-    // @ts-ignore
-    // const provider = new providers.Web3Provider(window.ethereum);
     const payerHasSufficientFunds = await hasSufficientFunds(
       requestData,
       address,
