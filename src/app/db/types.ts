@@ -138,6 +138,11 @@ export interface Database {
 export type User = Database["public"]["Tables"]["users"]["Row"];
 
 export type Group = Database["public"]["Tables"]["groups"]["Row"];
+export type GroupWithMembers = Group & {
+  members: {
+    address: string;
+  }[];
+};
 export type CreateGroup = Database["public"]["Tables"]["groups"]["Insert"];
 
 export type UserHasGroup =
