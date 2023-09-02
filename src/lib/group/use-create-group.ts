@@ -1,8 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import { useAccount, useSigner } from "wagmi";
 
 import { GroupAbi, GroupBytecode } from "@abis/group";
+
+interface CreateGroupParams {
+  stakeAmount: BigNumber;
+  initialMembers: string[];
+}
 
 interface UseCreateRequestOptions {
   onSuccess?: () => void;
@@ -14,7 +19,7 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
   const { data: signer } = useSigner();
 
   return useMutation(
-    async () => {
+    async ({ stakeAmount, initialMembers }: CreateGroupParams) => {
       if (!address || !signer) throw new Error("No address");
 
       // Deploy the contract
@@ -24,8 +29,6 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
         signer,
       );
 
-      const stakeAmount = ethers.utils.parseEther("0.01");
-      const initialMembers = [address];
       const contract = await factory.deploy(stakeAmount, initialMembers);
 
       await contract.deployed();

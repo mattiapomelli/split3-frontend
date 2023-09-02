@@ -12,7 +12,7 @@ interface UseGroupContractOptions {
 
 export const useGroupContract = ({
   address,
-  withSigner,
+  withSigner = true,
 }: UseGroupContractOptions) => {
   const provider = useProvider();
   const { data: signer } = useSigner();

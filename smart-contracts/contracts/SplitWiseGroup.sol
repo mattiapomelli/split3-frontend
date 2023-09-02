@@ -141,6 +141,10 @@ contract SplitWiseGroup {
         }
     }
 
+    function getActiveMembers() public view returns (address[] memory) {
+        return activeMembers;
+    }
+
     // Get the address of an active member by index
     function getActiveMember(uint256 index) public view returns (address) {
         require(index < activeMembers.length, "Member not found");

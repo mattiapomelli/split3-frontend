@@ -29,6 +29,7 @@ export interface SplitWiseGroupInterface extends utils.Interface {
     "activeMembers(uint256)": FunctionFragment;
     "addToWhitelist(address[])": FunctionFragment;
     "getActiveMember(uint256)": FunctionFragment;
+    "getActiveMembers()": FunctionFragment;
     "getActiveMembersCount()": FunctionFragment;
     "isMember(address)": FunctionFragment;
     "isSettled()": FunctionFragment;
@@ -49,6 +50,7 @@ export interface SplitWiseGroupInterface extends utils.Interface {
       | "activeMembers"
       | "addToWhitelist"
       | "getActiveMember"
+      | "getActiveMembers"
       | "getActiveMembersCount"
       | "isMember"
       | "isSettled"
@@ -75,6 +77,10 @@ export interface SplitWiseGroupInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getActiveMember",
     values: [PromiseOrValue<BigNumberish>],
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getActiveMembers",
+    values?: undefined,
   ): string;
   encodeFunctionData(
     functionFragment: "getActiveMembersCount",
@@ -130,6 +136,10 @@ export interface SplitWiseGroupInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getActiveMember",
+    data: BytesLike,
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getActiveMembers",
     data: BytesLike,
   ): Result;
   decodeFunctionResult(
@@ -209,6 +219,8 @@ export interface SplitWiseGroup extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<[string]>;
 
+    getActiveMembers(overrides?: CallOverrides): Promise<[string[]]>;
+
     getActiveMembersCount(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     isMember(
@@ -276,6 +288,8 @@ export interface SplitWiseGroup extends BaseContract {
     index: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides,
   ): Promise<string>;
+
+  getActiveMembers(overrides?: CallOverrides): Promise<string[]>;
 
   getActiveMembersCount(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -345,6 +359,8 @@ export interface SplitWiseGroup extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<string>;
 
+    getActiveMembers(overrides?: CallOverrides): Promise<string[]>;
+
     getActiveMembersCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     isMember(
@@ -411,6 +427,8 @@ export interface SplitWiseGroup extends BaseContract {
       index: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides,
     ): Promise<BigNumber>;
+
+    getActiveMembers(overrides?: CallOverrides): Promise<BigNumber>;
 
     getActiveMembersCount(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -480,6 +498,8 @@ export interface SplitWiseGroup extends BaseContract {
       index: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
+
+    getActiveMembers(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getActiveMembersCount(
       overrides?: CallOverrides,
