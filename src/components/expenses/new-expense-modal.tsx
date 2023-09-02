@@ -100,21 +100,23 @@ export const NewExpenseModal = ({
         <div>
           <Label>Split between:</Label>
           <div className="flex flex-col gap-2">
-            {group.members.map((member) => (
-              <button
-                key={member.user_address}
-                type="button"
-                onClick={() => onToggleDebtor(member.user_address)}
-                className={cx(
-                  "rounded-box w-full p-4 py-2",
-                  debtors.includes(member.user_address)
-                    ? "bg-primary/60"
-                    : "bg-base-200 hover:bg-base-300",
-                )}
-              >
-                <Address address={member.user_address as `0x${string}`} />
-              </button>
-            ))}
+            {group.members
+              .filter((member) => member.status === "active")
+              .map((member) => (
+                <button
+                  key={member.user_address}
+                  type="button"
+                  onClick={() => onToggleDebtor(member.user_address)}
+                  className={cx(
+                    "rounded-box w-full p-4 py-2",
+                    debtors.includes(member.user_address)
+                      ? "bg-primary/60"
+                      : "bg-base-200 hover:bg-base-300",
+                  )}
+                >
+                  <Address address={member.user_address as `0x${string}`} />
+                </button>
+              ))}
           </div>
         </div>
 
