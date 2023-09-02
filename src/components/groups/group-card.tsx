@@ -12,8 +12,6 @@ interface ProjectCardProps {
 }
 
 export const GroupCard = ({ group, className }: ProjectCardProps) => {
-  console.log("group", group);
-
   const membersCount = group.members.filter(
     (member) => member.status === "active",
   ).length;

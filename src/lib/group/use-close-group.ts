@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { useAccount, useSigner } from "wagmi";
 
 import { GroupAbi } from "@abis/group";
+import { toast } from "@components/basic/toast";
 import { createTransaction, proposeTransaction } from "@lib/safe";
 import { getSafe } from "@lib/safe/utils";
 import { supabaseClient } from "app/db";
@@ -32,6 +33,12 @@ export const useCloseGroup = (options?: UseCreateRequestOptions) => {
         group_contract,
         new ethers.utils.Interface(GroupAbi).encodeFunctionData("close"),
       );
+
+      toast({
+        title: "MultiSig Transaction Proposal",
+        description: "Proposing transaction",
+        type: "loading",
+      });
       const txHash = await proposeTransaction(
         signer,
         safe,
@@ -39,6 +46,12 @@ export const useCloseGroup = (options?: UseCreateRequestOptions) => {
         closeGroupTx,
         address,
       );
+
+      toast({
+        title: "MultiSig Transaction Proposal",
+        description: "Transaction proposed",
+        type: "success",
+      });
 
       const { error } = await supabaseClient
         .from("groups")
@@ -49,6 +62,13 @@ export const useCloseGroup = (options?: UseCreateRequestOptions) => {
     },
     {
       onSuccess: options?.onSuccess,
+      onError() {
+        toast({
+          title: "MultiSig Transaction Proposal",
+          description: "Propose failed",
+          type: "error",
+        });
+      },
     },
   );
 };
