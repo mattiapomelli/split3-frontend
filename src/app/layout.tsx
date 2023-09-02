@@ -3,6 +3,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 
 import { Inter } from "next/font/google";
 
+import { Toaster } from "@components/basic/toast";
 import { Container } from "@components/layout/container";
 import { Footer } from "@components/layout/footer";
 import { Navbar } from "@components/layout/navbar";
@@ -61,6 +62,7 @@ export default function RootLayout({
             </main>
             <Footer />
           </div>
+          <Toaster />
         </Providers>
       </body>
     </html>

@@ -3,6 +3,7 @@ import { BigNumber, ethers } from "ethers";
 import { useAccount, useNetwork, useSigner } from "wagmi";
 
 import { GroupAbi } from "@abis/group";
+import { toast } from "@components/basic/toast";
 import { createTransaction, proposeTransaction } from "@lib/safe";
 import { getSafe } from "@lib/safe/utils";
 import { createExpense } from "app/db/expenses";
@@ -45,6 +46,12 @@ export const useCreateExpense = (options?: UseCreateRequestOptions) => {
           amount,
         ]),
       );
+      toast({
+        title: "MultiSig Transaction Proposal",
+        description: "Proposing transaction",
+        type: "loading",
+      });
+
       const txHash = await proposeTransaction(
         signer,
         safe,
@@ -52,16 +59,32 @@ export const useCreateExpense = (options?: UseCreateRequestOptions) => {
         createExpenseTx,
         address,
       );
-      return await createExpense({
+
+      const id = await createExpense({
         ...rest,
         amount: Number(amount.toString()),
         user_address: payer_address.toLowerCase(),
         status: "pending",
         tx_hash: txHash,
       });
+
+      toast({
+        title: "MultiSig Transaction Proposal",
+        description: "Transaction proposed",
+        type: "success",
+      });
+
+      return id;
     },
     {
       onSuccess: options?.onSuccess,
+      onError() {
+        toast({
+          title: "MultiSig Transaction Proposal",
+          description: "Propose failed",
+          type: "error",
+        });
+      },
     },
   );
 };

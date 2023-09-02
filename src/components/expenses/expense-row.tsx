@@ -86,11 +86,13 @@ export const ExpenseRow = ({
       confirmAndExecute({
         groupOwner: group.owner,
         txnHash: expense.tx_hash || "",
+        transaction,
       });
     } else {
       confirmTransaction({
         groupOwner: group.owner,
         txnHash: expense.tx_hash || "",
+        transaction,
       });
     }
   };
@@ -135,7 +137,7 @@ export const ExpenseRow = ({
         ) : (
           <div>
             {transaction?.confirmations?.length} /{" "}
-            {transaction?.confirmationsRequired} Confirmations{" "}
+            {transaction?.confirmationsRequired} Signatures{" "}
             {!transaction?.isExecuted &&
               expense.user_address !== address?.toLowerCase() &&
               shouldShowApproveButton && (

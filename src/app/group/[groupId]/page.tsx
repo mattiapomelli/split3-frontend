@@ -2,7 +2,6 @@
 
 import { ArrowLeftIcon, PlusIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
 import { useAccount } from "wagmi";
 
@@ -32,7 +31,6 @@ interface GroupPageInnerProps {
 
 const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   const { address } = useAccount();
-  const router = useRouter();
   const [newExpenseModalOpen, setNewExpenseModalOpen] = useState(false);
 
   const { data: transaction, refetch } = useGetSafeTransaction({
@@ -96,6 +94,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
       confirmAndExecute({
         groupOwner: group.owner,
         txnHash: group.close_txn_hash,
+        transaction,
       });
     } else {
       confirmTransaction({
@@ -127,7 +126,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
 
   const { mutate: joinGroup, isLoading: isLoadingJoin } = useJoinGroup({
     onSuccess() {
-      router.push(`/group/${group.id}`);
+      onSuccess?.();
     },
   });
 
@@ -192,15 +191,17 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
           <br />
           {balance && <span>Balance: {balance} $ETH</span>}
         </div>
-        {currentUserStatus === "active" ? (
-          <CopyButton text={`http://localhost:3000/join/${group.id}`}>
+        {currentUserStatus === "active" && (
+          <CopyButton text={`${window.location.origin}/join/${group.id}`}>
             Copy Invite Link
           </CopyButton>
-        ) : (
+        )}
+
+        {currentUserStatus === "inactive" && (
           <Button
             onClick={onJoinGroup}
             loading={isLoadingJoin}
-            disabled={isLoading || group.closed}
+            disabled={isLoadingJoin || group.closed}
           >
             Join
           </Button>
@@ -216,8 +217,8 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
           Deposit
         </Button>
       </div>
-      <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
-        <h2 className="mb-4 text-2xl font-bold">Debts</h2>
+      <div className="mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+        <h2 className=" text-2xl font-bold">Debts</h2>
         <div>
           {!group.closed && currentUserStatus === "active" && (
             <div>
@@ -225,7 +226,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
                 <div className="flex items-center gap-2">
                   <div>
                     {transaction?.confirmations?.length} /{" "}
-                    {transaction?.confirmationsRequired} Confirmations{" "}
+                    {transaction?.confirmationsRequired} Signatures{" "}
                   </div>
                   {!hasConfirmed && (
                     <Button

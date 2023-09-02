@@ -28,7 +28,7 @@ export const DebtsList = ({
 
   const nonZeroDebts = userDebts.filter((debt) => debt.amount !== 0);
 
-  if (!userDebts.length)
+  if (!nonZeroDebts.length)
     return (
       <div className="rounded-box mt-6 border border-base-300 py-14 text-center">
         No debts yet
