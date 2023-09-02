@@ -39,21 +39,21 @@ export interface Database {
       group_expenses: {
         Row: {
           amount: number | null;
-          creditor_user_address: string | null;
+          creditor_user_address: string;
           group_id: number | null;
           id: number;
           user_address: string | null;
         };
         Insert: {
           amount?: number | null;
-          creditor_user_address: string | null;
+          creditor_user_address: string;
           group_id?: number | null;
           id?: number;
           user_address?: string | null;
         };
         Update: {
           amount?: number | null;
-          creditor_user_address?: string | null;
+          creditor_user_address?: string;
           group_id?: number | null;
           id?: number;
           user_address?: string | null;

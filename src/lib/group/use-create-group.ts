@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { BigNumber, ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import { useAccount, useNetwork, useSigner } from "wagmi";
 
 import { GroupAbi, GroupBytecode } from "@abis/group";
@@ -26,8 +26,12 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
     async ({ stakeAmount, initialMembers, name }: CreateGroupParams) => {
       if (!address || !signer || !chain) throw new Error("No address");
 
+      console.log("Initial members: ", initialMembers);
+
       const safe = await deploySafe(signer, initialMembers);
       const safeAddress = await safe.getAddress();
+
+      console.log("Safe address: ", safeAddress);
 
       // Deploy the contract
       const factory = new ethers.ContractFactory(
@@ -36,17 +40,18 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
         signer,
       );
 
-      const contract = await factory.deploy(stakeAmount, initialMembers);
+      const groupContract = await factory.deploy(stakeAmount, initialMembers);
+      await groupContract.deployed();
 
-      await contract.deployed();
+      console.log("Group address: ", groupContract.address);
 
       // const requiredAmount = await contract.requiredAmount();
 
-      const { data, error } = await supabaseClient
+      const { data: group, error } = await supabaseClient
         .from("groups")
         .insert({
-          address: contract.address,
-          chain: chain?.name,
+          address: groupContract.address,
+          chain: chain.name,
           owner: safeAddress,
           required_amount: Number(stakeAmount.toString()),
           name,
@@ -54,14 +59,16 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
         .select("*")
         .single();
 
-      await supabaseClient.from("user_has_groups").insert({
-        user_address: address.toLowerCase(),
-        group_id: data!.id,
-      });
+      console.log("Group:", group);
 
       if (error) throw error;
 
-      return data.id;
+      await supabaseClient.from("user_has_groups").insert({
+        user_address: address.toLowerCase(),
+        group_id: group.id,
+      });
+
+      return group.id;
     },
     {
       onSuccess: options?.onSuccess,
