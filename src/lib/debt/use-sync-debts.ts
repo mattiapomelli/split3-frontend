@@ -2,13 +2,14 @@ import { useMutation } from "@tanstack/react-query";
 import { useNetwork, useSigner } from "wagmi";
 
 import { getGroupContract } from "@lib/group/get-group-contract";
+import { formatAmount } from "@utils/amounts";
+import { GroupExpense, GroupWithMembers } from "app/db/types";
 
 import { upsertDebt } from "../../app/db/debts";
-import { getGroupMembers } from "../../app/db/user_has_groups";
 
 interface UseSyncGroupDebtsParams {
-  groupId: number;
-  groupAddress: string;
+  group: GroupWithMembers;
+  expense: GroupExpense;
 }
 
 interface UseSyncGroupDebtsOptions {
@@ -20,20 +21,38 @@ export const useSyncGroupDebts = (options?: UseSyncGroupDebtsOptions) => {
   const { chain } = useNetwork();
 
   return useMutation(
-    async ({ groupId, groupAddress }: UseSyncGroupDebtsParams) => {
+    async ({ group, expense }: UseSyncGroupDebtsParams) => {
       if (!signer || !chain) throw new Error("No address");
-      const groupMembers = await getGroupMembers(groupId);
-      const GroupContract = getGroupContract(groupAddress, signer);
-      for await (const m1 of groupMembers) {
-        for await (const m2 of groupMembers.filter(
-          (m: string) => m.toLowerCase() !== m1.toLowerCase(),
-        )) {
-          const debt = (await GroupContract.getDebt(m1, m2)).toNumber();
-          console.log(debt);
-          await upsertDebt(groupId, m2.toLowerCase(), m1.toLowerCase(), debt);
+      // const groupMembers = await getGroupMembers(groupId);
+      const GroupContract = getGroupContract(group.address, signer);
+
+      const expenseMembers = [
+        expense.user_address || "",
+        ...expense.debtor_addresses.split(","),
+      ];
+
+      for await (const m1 of expenseMembers) {
+        console.log("Member:", m1);
+
+        const otherMembers = expenseMembers.filter(
+          (m) => m.toLowerCase() !== m1.toLowerCase(),
+        );
+
+        for await (const m2 of otherMembers) {
+          const debt = await GroupContract.getDebt(m1, m2);
+
+          console.log("Debt:", debt);
+
+          const amount = Number(formatAmount(Number(debt.toString())));
+          await upsertDebt(
+            group.id,
+            m2.toLowerCase(),
+            m1.toLowerCase(),
+            amount,
+          );
         }
       }
-      return groupId;
+      return group.id;
     },
     {
       onSuccess: options?.onSuccess,

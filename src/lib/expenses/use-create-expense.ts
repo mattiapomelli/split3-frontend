@@ -43,7 +43,7 @@ export const useCreateExpense = (options?: UseCreateRequestOptions) => {
           payer_address, // address _payer,
           rest.title, // string _name,
           rest.debtor_addresses.split(","), // address[] calldata _debtor_address,
-          parseAmount(amount.toString()),
+          amount,
         ]),
       );
       const txHash = await proposeTransaction(

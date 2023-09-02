@@ -208,6 +208,7 @@ export type Group = Database["public"]["Tables"]["groups"]["Row"];
 export type GroupWithMembers = Group & {
   members: {
     user_address: string;
+    status: string;
   }[];
 };
 export type GroupWithInfo = GroupWithMembers & {

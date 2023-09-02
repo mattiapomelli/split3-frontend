@@ -31,18 +31,36 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
     });
   };
 
+  const groupMembers = group.members.filter(
+    (member) => member.status === "active",
+  );
+
+  const invitedMembers = group.members.filter(
+    (member) => member.status === "inactive",
+  );
+
   return (
     <div>
       <div className="flex justify-between">
         <div>
           <h1 className="mb-4 text-3xl font-bold">{group.name}</h1>
           <span>Members: </span>
-          {group.members.map((member, index) => (
+          {groupMembers.map((member, index) => (
             <Fragment key={member.user_address}>
               <span>
                 <Address address={member.user_address as `0x${string}`} />
               </span>
-              {index < group.members.length - 1 ? ", " : ""}
+              {index < groupMembers.length - 1 ? ", " : ""}
+            </Fragment>
+          ))}
+          <br />
+          <span>Pending Invites: </span>
+          {invitedMembers.map((member, index) => (
+            <Fragment key={member.user_address}>
+              <span>
+                <Address address={member.user_address as `0x${string}`} />
+              </span>
+              {index < invitedMembers.length - 1 ? ", " : ""}
             </Fragment>
           ))}
         </div>
