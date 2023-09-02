@@ -8,6 +8,7 @@ import { useIsSignedIn } from "@lib/auth/use-is-signed-in";
 import { useSignIn } from "@lib/auth/use-sign-in";
 import { useCreateGroup } from "@lib/group/use-create-group";
 import { useActiveMembers } from "@lib/group/use-group-members";
+import { useGroups } from "@lib/group/use-groups";
 import { useJoinGroup } from "@lib/group/use-join-group";
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
   const { mutate: signIn, isLoading: isLoadingSignIn } = useSignIn();
 
   const { mutate: createGroup, isLoading } = useCreateGroup();
+  const { data: groups } = useGroups();
 
   const { mutate: joinGroup, isLoading: isLoadingJoin } = useJoinGroup({
     groupAddress: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
@@ -37,6 +39,7 @@ export default function Home() {
     createGroup({
       initialMembers: [address, "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"],
       stakeAmount: amount,
+      name: "Group 1",
     });
   };
 
@@ -74,6 +77,14 @@ export default function Home() {
         {members?.map((member) => (
           <div key={member}>{member}</div>
         ))}
+      </div>
+      <h3>Groups</h3>
+      <div>
+        <div>
+          {groups?.map((group) => (
+            <div key={group.id}>{group.name}</div>
+          ))}
+        </div>
       </div>
     </div>
   );

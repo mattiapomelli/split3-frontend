@@ -7,7 +7,8 @@
     "build": "next build",
     "postbuild": "NODE_ENV=production next-sitemap",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-types": "export $(grep 'SUPABASE_PROJECT_REF' .env.local | xargs) && npx supabase gen types typescript --project-id cecjowgrkmtjzkmrcbwl --schema public > src/app/db/types.ts"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.3",
