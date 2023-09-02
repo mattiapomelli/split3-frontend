@@ -9,7 +9,7 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      group: {
+      groups: {
         Row: {
           address: string;
           chain: string;
@@ -39,21 +39,21 @@ export interface Database {
       group_expenses: {
         Row: {
           amount: number | null;
-          creditor_user_address: number | null;
+          creditor_user_address: string | null;
           group_id: number | null;
           id: number;
           user_address: string | null;
         };
         Insert: {
           amount?: number | null;
-          creditor_user_address?: number | null;
+          creditor_user_address: string | null;
           group_id?: number | null;
           id?: number;
           user_address?: string | null;
         };
         Update: {
           amount?: number | null;
-          creditor_user_address?: number | null;
+          creditor_user_address?: string | null;
           group_id?: number | null;
           id?: number;
           user_address?: string | null;
@@ -62,7 +62,7 @@ export interface Database {
           {
             foreignKeyName: "group_expenses_group_id_fkey";
             columns: ["group_id"];
-            referencedRelation: "group";
+            referencedRelation: "groups";
             referencedColumns: ["id"];
           },
           {
@@ -93,7 +93,7 @@ export interface Database {
           {
             foreignKeyName: "user_has_group_group_id_fkey";
             columns: ["group_id"];
-            referencedRelation: "group";
+            referencedRelation: "groups";
             referencedColumns: ["id"];
           },
           {
@@ -136,3 +136,10 @@ export interface Database {
 }
 
 export type User = Database["public"]["Tables"]["users"]["Row"];
+export type Group = Database["public"]["Tables"]["groups"]["Row"];
+export type UserHasGroup =
+  Database["public"]["Tables"]["user_has_group"]["Row"];
+export type GroupExpense =
+  Database["public"]["Tables"]["group_expenses"]["Row"];
+export type CreateGroupExpense =
+  Database["public"]["Tables"]["group_expenses"]["Insert"];

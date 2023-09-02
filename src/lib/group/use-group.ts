@@ -8,10 +8,10 @@ interface UseGroupOptions {
 
 export const useGroup = ({ groupId }: UseGroupOptions) => {
   return useQuery({
-    queryKey: ["group", groupId],
+    queryKey: ["groups", groupId],
     queryFn: async () => {
       const { data, error } = await supabaseClient
-        .from("group")
+        .from("groups")
         .select("*, members:user_has_group(address:user_address)")
         .eq("id", groupId)
         .single();

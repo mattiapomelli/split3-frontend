@@ -43,7 +43,7 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
       // const requiredAmount = await contract.requiredAmount();
 
       const { data, error } = await supabaseClient
-        .from("group")
+        .from("groups")
         .insert({
           address: contract.address,
           chain: chain?.name,

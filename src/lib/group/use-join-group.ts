@@ -19,7 +19,7 @@ export const useJoinGroup = (options?: UseCreateRequestOptions) => {
       if (!address || !signer) throw new Error("No address");
 
       const { data: group, error } = await supabaseClient
-        .from("group")
+        .from("groups")
         .select("*")
         .eq("id", groupId)
         .single();

@@ -7,7 +7,7 @@ export const useGroups = () => {
     queryKey: ["groups"],
     queryFn: async () => {
       const { data, error } = await supabaseClient
-        .from("group")
+        .from("groups")
         .select("*, members:user_has_group(address:user_address)");
       if (error) throw error;
 
