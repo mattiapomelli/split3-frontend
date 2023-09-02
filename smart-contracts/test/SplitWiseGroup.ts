@@ -91,6 +91,52 @@ describe("SplitWiseGroup contract", function () {
     });
   });
 
+  describe("Add expenses to the group", function () {
+    it("should allow the owner to add an expense", async function () {
+      const name = "Test Expense";
+      const amount = ethers.utils.parseEther("1.0");
+
+      // Call the addExpense function
+      await splitWiseGroup.addExpense(
+        member1.address,
+        name,
+        [member2.address, member3.address],
+        amount,
+      );
+
+      const expensesLength = await splitWiseGroup.expensesLength();
+
+      // Get the last added expenses
+      const lastExpense = await splitWiseGroup.getExpense(expensesLength - 1);
+
+      // Assert that the expense data matches the input
+      expect(lastExpense.payer).to.equal(member1.address);
+      expect(lastExpense.name).to.equal(name);
+      expect(lastExpense.amount).to.equal(amount);
+      expect(lastExpense.creditor_addresses).to.deep.equal([
+        member2.address,
+        member3.address,
+      ]);
+    });
+
+    it("should not allow non-owners to add an expense", async function () {
+      const name = "Test Expense";
+      const amount = ethers.utils.parseEther("1.0");
+
+      // Attempt to call the addExpense function from a non-owner account
+      await expect(
+        splitWiseGroup
+          .connect(member1)
+          .addExpense(
+            member2.address,
+            name,
+            [member3.address, member4.address],
+            amount,
+          ),
+      ).to.be.revertedWith("Only the owner can call this function");
+    });
+  });
+
   describe("Remove members from the group", function () {
     it("Should allow the owner to remove an active member", async function () {
       // Ensure member1 is an active member
@@ -159,6 +205,4 @@ describe("SplitWiseGroup contract", function () {
       );
     });
   });
-
-  // Add more test cases as needed for other contract functions.
 });

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "hardhat/console.sol";
+
 contract SplitWiseGroup {
     // Enum to represent member status
     enum MemberStatus { Inactive, Active }
@@ -23,6 +25,23 @@ contract SplitWiseGroup {
     // Boolean flag to indicate if the group has been settled
     bool public isSettled;
 
+    // Struct to represent an expense
+    struct Expense {
+        address payer;                   // Address of the member who paid the expense
+        string name;                     // Name of the expense
+        uint256 amount;                  // Total expense amount
+        address[] creditor_addresses;
+    }
+
+    // Array to store expenses
+    mapping (uint256 => Expense) public expenses;
+
+    uint256 public expensesLength;
+
+    // Event to log when an expense is added
+    event ExpenseAdded(uint256 expenseIndex, address payer, uint256 amount, string name, address[] creditor_addresses);
+
+
     // Constructor to initialize the contract with required amount and initial members
     constructor(uint256 _requiredAmount, address[] memory _members, address _owner) payable {
         require(_members.length > 0, "At least one member is required");
@@ -36,6 +55,9 @@ contract SplitWiseGroup {
 
         // Initialize the group as unsettled
         isSettled = false;
+
+        // Initialize the expensesLength to 0
+        expensesLength = 0;
 
         // Initialize members with the provided addresses as Inactive
         for (uint256 i = 0; i < _members.length; i++) {
@@ -60,6 +82,12 @@ contract SplitWiseGroup {
     // Modifier to ensure the group is open (not settled)
     modifier isOpen() {
         require(!isSettled, "The group is closed");
+        _;
+    }
+
+    // Modifier to ensure only active members can call functions related to expenses
+    modifier onlyActiveMember() {
+        require(isMember(msg.sender), "Only active members can call this function");
         _;
     }
 
@@ -171,6 +199,37 @@ contract SplitWiseGroup {
 
         // Transfer the specified amount to the recipient
         payable(recipient).transfer(amount);
+    }
+
+    // Add an expense to be split among specified creditors
+    function addExpense(address _payer, string memory _name, address[] calldata _creditor_addresses, uint256 _amount) external onlyOwner isOpen {
+        require(bytes(_name).length > 0, "Expense name cannot be empty");
+        require(_amount > 0, "Expense amount must be greater than 0");
+        require(_creditor_addresses.length > 0, "At least one creditor is required");
+        require(isMember(_payer), "Payer is not a member");
+        // TODO: ensure that _creditor_addresses are members
+
+        // Create a new expense
+        Expense memory newExpense = Expense({
+            payer : _payer,
+            name : _name,
+            amount : _amount,
+            creditor_addresses : _creditor_addresses
+        });
+
+        // Add the expense to the expenses mapping
+        expenses[expensesLength] = newExpense;
+
+        expensesLength++;
+
+        // Emit an event to log the expense
+        emit ExpenseAdded(expensesLength, _payer, _amount, _name, _creditor_addresses);
+    }
+
+    // Get expense by index
+    function getExpense(uint256 index) public view returns (Expense memory) {
+        require(index < expensesLength, "Expense not found");
+        return expenses[index];
     }
 
     // Fallback function to receive Ether
