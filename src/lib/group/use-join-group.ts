@@ -1,26 +1,43 @@
 import { useMutation } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
+import { useAccount, useSigner } from "wagmi";
 
-import { useGroupContract } from "./use-group-contract";
+import { supabaseClient } from "app/db";
+
+import { getGroupContract } from "./get-group-contract";
 
 interface UseCreateRequestOptions {
-  groupAddress: string;
   onSuccess?: () => void;
 }
 
-export const useJoinGroup = (options: UseCreateRequestOptions) => {
+export const useJoinGroup = (options?: UseCreateRequestOptions) => {
   const { address } = useAccount();
-  const groupContract = useGroupContract({
-    address: options.groupAddress,
-  });
+
+  const { data: signer } = useSigner();
 
   return useMutation(
-    async () => {
-      if (!address || !groupContract) throw new Error("No address");
+    async ({ groupId }: { groupId: number }) => {
+      if (!address || !signer) throw new Error("No address");
 
-      // Deploy the contract
+      const { data: group, error } = await supabaseClient
+        .from("group")
+        .select("*")
+        .eq("id", groupId)
+        .single();
+      if (error) throw error;
+
+      const groupContract = getGroupContract(group.address, signer);
+
       const stakeAmount = await groupContract.requiredAmount();
       const tx = await groupContract.join({ value: stakeAmount });
+
+      const { error: error2 } = await supabaseClient
+        .from("user_has_group")
+        .insert({
+          group_id: groupId,
+          user_address: address.toLowerCase(),
+        });
+
+      if (error2) throw error2;
 
       await tx.wait();
     },

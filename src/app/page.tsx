@@ -7,7 +7,8 @@ import { Button } from "@components/basic/button";
 import { useIsSignedIn } from "@lib/auth/use-is-signed-in";
 import { useSignIn } from "@lib/auth/use-sign-in";
 import { useCreateGroup } from "@lib/group/use-create-group";
-import { useActiveMembers } from "@lib/group/use-group-members";
+// import { useActiveMembers } from "@lib/group/use-group-members";
+import { useGroup } from "@lib/group/use-group";
 import { useGroups } from "@lib/group/use-groups";
 import { useJoinGroup } from "@lib/group/use-join-group";
 
@@ -20,13 +21,17 @@ export default function Home() {
   const { mutate: createGroup, isLoading } = useCreateGroup();
   const { data: groups } = useGroups();
 
-  const { mutate: joinGroup, isLoading: isLoadingJoin } = useJoinGroup({
-    groupAddress: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+  const { data: group } = useGroup({
+    groupId: 1,
   });
 
-  const { data: members } = useActiveMembers({
-    groupAddress: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
-  });
+  console.log("Group: ", group);
+
+  const { mutate: joinGroup, isLoading: isLoadingJoin } = useJoinGroup();
+
+  // const { data: members } = useActiveMembers({
+  //   groupAddress: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+  // });
 
   const onSignIn = () => {
     signIn();
@@ -43,10 +48,12 @@ export default function Home() {
     });
   };
 
-  const onJoinGroup = async () => {
+  const onJoinGroup = async (groupId: number) => {
     if (!address) return;
 
-    joinGroup();
+    joinGroup({
+      groupId,
+    });
   };
 
   return (
@@ -65,24 +72,28 @@ export default function Home() {
       <Button onClick={onCreateGroup} disabled={isLoading} loading={isLoading}>
         Create group
       </Button>
-      <Button
-        onClick={onJoinGroup}
-        disabled={isLoadingJoin}
-        loading={isLoadingJoin}
-      >
-        Join group
-      </Button>
-      <h3>Members</h3>
-      <div>
-        {members?.map((member) => (
-          <div key={member}>{member}</div>
-        ))}
-      </div>
+
       <h3>Groups</h3>
       <div>
         <div>
           {groups?.map((group) => (
-            <div key={group.id}>{group.name}</div>
+            <div key={group.id}>
+              {group.name}
+
+              <div>
+                {group.members.map((member) => (
+                  <div key={member.address}>{member.address}</div>
+                ))}
+              </div>
+
+              <Button
+                onClick={() => onJoinGroup(group.id)}
+                disabled={isLoadingJoin}
+                loading={isLoadingJoin}
+              >
+                Join
+              </Button>
+            </div>
           ))}
         </div>
       </div>
