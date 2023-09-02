@@ -30,7 +30,7 @@ export const DebtsList = ({ group }: ExpensesListProps) => {
           className={cx(
             { "-mt-px": index !== 0 },
             { "rounded-t-box": index === 0 },
-            { "rounded-b-box": index === group.expenses.length - 1 },
+            { "rounded-b-box": index === group.debts.length - 1 },
           )}
         />
       ))}

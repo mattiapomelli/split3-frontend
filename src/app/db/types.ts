@@ -12,24 +12,30 @@ export interface Database {
       debts: {
         Row: {
           amount: number;
-          creditor_address: string | null;
-          debtor_address: string | null;
+          creditor_address: string;
+          debtor_address: string;
           group_id: number;
           id: number;
+          request_id: string | null;
+          settled: boolean;
         };
         Insert: {
           amount?: number;
-          creditor_address?: string | null;
-          debtor_address?: string | null;
+          creditor_address: string;
+          debtor_address: string;
           group_id: number;
           id?: number;
+          request_id?: string | null;
+          settled?: boolean;
         };
         Update: {
           amount?: number;
-          creditor_address?: string | null;
-          debtor_address?: string | null;
+          creditor_address?: string;
+          debtor_address?: string;
           group_id?: number;
           id?: number;
+          request_id?: string | null;
+          settled?: boolean;
         };
         Relationships: [
           {

@@ -96,8 +96,6 @@ export const useCreateRequest = (options?: UseCreateRequestOptions) => {
         amount,
       });
 
-      console.log("Creating request: ");
-
       const requestClient = getRequestClient();
       const request = await requestClient.createRequest(
         requestCreateParameters,

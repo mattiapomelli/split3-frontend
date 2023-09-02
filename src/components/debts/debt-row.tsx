@@ -4,6 +4,8 @@ import cx from "classnames";
 import { useAccount } from "wagmi";
 
 import { Address } from "@components/address";
+import { Button } from "@components/basic/button";
+import { useRequestDebtPayment } from "@lib/debt/use-request-debt-payment";
 import { Debt } from "app/db/types";
 
 interface ExpenseRowProps {
@@ -14,6 +16,19 @@ interface ExpenseRowProps {
 export const DebtRow = ({ debt, className }: ExpenseRowProps) => {
   const { address } = useAccount();
 
+  const userIsOwed = debt.creditor_address === address?.toLowerCase();
+
+  const { mutate: requestPayment, isLoading: isRequestLoading } =
+    useRequestDebtPayment({
+      onSuccess() {},
+    });
+
+  const onRequestDebtPayment = () => {
+    requestPayment({
+      debt,
+    });
+  };
+
   return (
     <div
       className={cx(
@@ -21,7 +36,7 @@ export const DebtRow = ({ debt, className }: ExpenseRowProps) => {
         className,
       )}
     >
-      {debt.creditor_address === address?.toLowerCase() ? (
+      {userIsOwed ? (
         <p>
           <Address address={debt.debtor_address as `0x${string}`} /> owes you{" "}
           <span className="font-medium">{debt.amount} USDC</span>
@@ -33,26 +48,36 @@ export const DebtRow = ({ debt, className }: ExpenseRowProps) => {
         </p>
       )}
 
-      {/* <div>
-        <Address address={expense.user_address as `0x${string}`} /> paid{" "}
-        {expense.amount && (
-          <span className="font-medium">
-            {ethers.utils.formatEther(expense.amount.toString())} USDC
-          </span>
-        )}
-      </div>
-
-      <div>
-        for{" "}
-        {debtorAddresses.map((user, index) => (
-          <Fragment key={user}>
-            <span>
-              <Address address={user as `0x${string}`} />
-            </span>
-            {index < debtorAddresses.length - 1 ? ", " : ""}
-          </Fragment>
-        ))}
-      </div> */}
+      {/* TODO: show this only if the group is closed */}
+      {userIsOwed ? (
+        <>
+          {debt.request_id ? (
+            <div>
+              You requested the payment
+              <Button>See Request</Button>
+            </div>
+          ) : (
+            <Button
+              onClick={() => onRequestDebtPayment()}
+              loading={isRequestLoading}
+              disabled={isRequestLoading}
+            >
+              Request payment
+            </Button>
+          )}
+        </>
+      ) : (
+        <>
+          {debt.request_id ? (
+            <div>
+              You have been requested a payment
+              <Button>See Request</Button>
+            </div>
+          ) : (
+            <Button>Settle debt</Button>
+          )}
+        </>
+      )}
     </div>
   );
 };
