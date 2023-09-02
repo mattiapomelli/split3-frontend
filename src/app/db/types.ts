@@ -64,6 +64,7 @@ export interface Database {
           debtor_addresses: string;
           group_id: number | null;
           id: number;
+          status: string;
           title: string | null;
           user_address: string | null;
         };
@@ -72,6 +73,7 @@ export interface Database {
           debtor_addresses: string;
           group_id?: number | null;
           id?: number;
+          status?: string;
           title?: string | null;
           user_address?: string | null;
         };
@@ -80,6 +82,7 @@ export interface Database {
           debtor_addresses?: string;
           group_id?: number | null;
           id?: number;
+          status?: string;
           title?: string | null;
           user_address?: string | null;
         };
@@ -103,7 +106,7 @@ export interface Database {
           address: string;
           chain: string;
           id: number;
-          name: string | null;
+          name: string;
           owner: string;
           required_amount: number | null;
         };
@@ -111,7 +114,7 @@ export interface Database {
           address: string;
           chain: string;
           id?: number;
-          name?: string | null;
+          name: string;
           owner: string;
           required_amount?: number | null;
         };
@@ -119,7 +122,7 @@ export interface Database {
           address?: string;
           chain?: string;
           id?: number;
-          name?: string | null;
+          name?: string;
           owner?: string;
           required_amount?: number | null;
         };
