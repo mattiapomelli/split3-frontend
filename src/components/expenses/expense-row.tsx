@@ -25,7 +25,7 @@ export const ExpenseRow = ({ expense, group, className }: ExpenseRowProps) => {
 
   console.log("Transaction");
 
-  const { mutate: executeTransaction } = useExecuteTransaction();
+  const { mutate: executeTransaction, isLoading } = useExecuteTransaction();
 
   const onExecuteTransaction = () => {
     executeTransaction({
@@ -79,7 +79,13 @@ export const ExpenseRow = ({ expense, group, className }: ExpenseRowProps) => {
             {transaction?.confirmations?.length} /{" "}
             {transaction?.confirmationsRequired} Confirmations{" "}
             {isThresholdReached && (
-              <Button onClick={onExecuteTransaction}>Approve</Button>
+              <Button
+                onClick={onExecuteTransaction}
+                loading={isLoading}
+                disabled={isLoading}
+              >
+                Approve
+              </Button>
             )}
           </div>
         )}
