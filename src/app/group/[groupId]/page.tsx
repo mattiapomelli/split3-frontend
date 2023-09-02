@@ -171,7 +171,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
           <Button
             onClick={onJoinGroup}
             loading={isLoadingJoin}
-            disabled={isLoading}
+            disabled={isLoading || group.closed}
           >
             Join
           </Button>
