@@ -318,7 +318,6 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
 
 interface ProjectPageProps {
   params: { groupId: string };
-  onCreate?: () => void;
 }
 
 export default function GroupPage({ params }: ProjectPageProps) {
