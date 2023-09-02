@@ -1,4 +1,7 @@
-import { SignatureResponse } from "@safe-global/api-kit";
+import {
+  SafeMultisigTransactionListResponse,
+  SignatureResponse,
+} from "@safe-global/api-kit";
 import Safe, {
   EthersAdapter,
   SafeAccountConfig,
@@ -90,4 +93,12 @@ export const executeTransaction = async (
     safeTransaction,
   );
   return await executeTxResponse.transactionResponse?.wait();
+};
+
+export const getPendingTransactions = async (
+  signerOrProvider: Signer | Provider,
+  safeAddress: string,
+): Promise<SafeMultisigTransactionListResponse> => {
+  const safeService = getSafeService(signerOrProvider);
+  return await safeService.getPendingTransactions(safeAddress);
 };
