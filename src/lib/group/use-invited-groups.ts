@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 
-import { getUserGroups } from "../../app/db/groups";
+import { getUserInvitedGroups } from "../../app/db/groups";
 
-export const useGroups = () => {
+export const useInvitedGroups = () => {
   const { address } = useAccount();
 
   return useQuery({
-    queryKey: ["groups"],
+    queryKey: ["invited-groups"],
     queryFn: async () => {
       if (!address) throw new Error("No address");
-      return await getUserGroups(address);
+      return await getUserInvitedGroups(address);
     },
   });
 };
