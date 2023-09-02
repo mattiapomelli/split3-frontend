@@ -12,7 +12,7 @@ export const useGroup = ({ groupId }: UseGroupOptions) => {
     queryFn: async () => {
       const { data, error } = await supabaseClient
         .from("groups")
-        .select("*, members:user_has_group(address:user_address)")
+        .select("*, members:user_has_group(user_address)")
         .eq("id", groupId)
         .single();
       if (error) throw error;

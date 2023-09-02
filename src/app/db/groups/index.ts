@@ -4,8 +4,8 @@ import { CreateGroup, Group } from "../types";
 export const getUserGroups = async (userAddress: string): Promise<Group[]> => {
   const { data, error } = await supabaseClient
     .from("groups")
-    .select("*, members:user_has_group(address:user_address)")
-    .eq("members.user_address", userAddress);
+    .select("*, members:user_has_group!inner(user_address)")
+    .eq("members.user_address", userAddress.toLowerCase());
   if (error) throw error;
   return data;
 };

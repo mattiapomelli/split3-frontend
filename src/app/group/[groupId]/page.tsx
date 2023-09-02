@@ -4,6 +4,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 
 import { Button } from "@components/basic/button";
+import { CopyButton } from "@components/copy-button";
 import { Spinner } from "@components/spinner";
 import { useGroup } from "@lib/group/use-group";
 import { GroupWithMembers } from "app/db/types";
@@ -15,12 +16,18 @@ interface ProjectPageProps {
 const GroupPageInner = ({ group }: { group: GroupWithMembers }) => {
   return (
     <div>
-      <h1 className="mb-4 text-3xl font-bold">{group.name}</h1>
+      <div className="flex justify-between">
+        <h1 className="mb-4 text-3xl font-bold">{group.name}</h1>
+        <CopyButton text={`http://localhost:3000/join/${group.id}`}>
+          Copy Invite Link
+        </CopyButton>
+      </div>
+
       <h3 className="text-lg font-bold">Members</h3>
       <div>
         {group.members.map((member) => (
-          <div key={member.address}>
-            <p>{member.address}</p>
+          <div key={member.user_address}>
+            <p>{member.user_address}</p>
           </div>
         ))}
       </div>

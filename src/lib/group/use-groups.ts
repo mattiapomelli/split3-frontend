@@ -8,7 +8,8 @@ export const useGroups = () => {
   return useQuery({
     queryKey: ["groups"],
     queryFn: async () => {
-      return await getUserGroups(address!);
+      if (!address) throw new Error("No address");
+      return await getUserGroups(address);
     },
   });
 };
