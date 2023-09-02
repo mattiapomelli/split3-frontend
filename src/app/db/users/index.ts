@@ -1,6 +1,5 @@
 import { supabaseClient } from "../index";
-
-import { User } from "./interface";
+import { User } from "../types";
 
 const COLLECTION_NAME = "users";
 
