@@ -1,5 +1,6 @@
 "use client";
 
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ethers } from "ethers";
 import { useRouter } from "next/navigation";
@@ -89,7 +90,7 @@ export const NewGroupForm = () => {
   return (
     <form className="flex w-full flex-col gap-3" onSubmit={onSubmit}>
       <Input
-        label="Name"
+        label="Group Name"
         type="text"
         {...register("name")}
         error={errors.name?.message}
@@ -165,6 +166,33 @@ export const NewGroupForm = () => {
         )}
       </div>
 
+        <Label className="ml-1">Members</Label>
+        <div className="flex flex-col gap-2">
+          {fields.map((field, index) => (
+            <Input
+              key={field.id}
+              // label={`Member ${index + 1} Address`}
+              block
+              {...register(`members.${index}.address`, {
+                required: "Title is required",
+              })}
+              error={errors.members?.[index]?.address?.message}
+            />
+          ))}
+        </div>
+      </div>
+      <Button
+        type="button"
+        color="neutral"
+        rightIcon={<PlusIcon className="h-5 w-5" />}
+        onClick={() =>
+          append({
+            address: "",
+          })
+        }
+      >
+        Add member
+      </Button>
       <Button className="mt-2" loading={isLoading} disabled={isLoading}>
         Create Group
       </Button>

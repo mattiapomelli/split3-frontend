@@ -10,7 +10,8 @@ const colorClassname = {
   success: "btn-success",
   warning: "btn-warning",
   error: "btn-error",
-  neutral: "btn-neutral",
+  neutral:
+    "border-base-300 bg-base-100 text-base-content hover:border-base-300 hover:bg-base-200 hover:text-base-content focus:ring-neutral/30",
 };
 
 const ringClassname = {

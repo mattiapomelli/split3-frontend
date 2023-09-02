@@ -1,7 +1,7 @@
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 
-import { Inter } from "next/font/google";
+import { Kumbh_Sans } from "next/font/google";
 
 import { Toaster } from "@components/basic/toast";
 import { Container } from "@components/layout/container";
@@ -12,7 +12,7 @@ import { Providers } from "./providers";
 
 import type { Metadata } from "next";
 
-const inter = Inter({ subsets: ["latin"] });
+const font = Kumbh_Sans({ subsets: ["latin"] });
 
 export const siteConfig = {
   name: "My dApp",
@@ -53,7 +53,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={font.className}>
         <Providers>
           <div className="flex min-h-screen flex-col">
             <Navbar />

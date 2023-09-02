@@ -1,3 +1,4 @@
+import { CheckIcon } from "@heroicons/react/24/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import cx from "classnames";
 import { ethers } from "ethers";
@@ -91,7 +92,7 @@ export const NewExpenseModal = ({
           error={errors.title?.message}
         />
         <Input
-          label="Amount (ETH)"
+          label="Amount (FAU)"
           type="number"
           step="0.000001"
           {...register("amount")}
@@ -108,12 +109,16 @@ export const NewExpenseModal = ({
                   type="button"
                   onClick={() => onToggleDebtor(member.user_address)}
                   className={cx(
+                    "relative",
                     "rounded-box w-full p-4 py-2",
                     debtors.includes(member.user_address)
                       ? "bg-primary/60"
                       : "bg-base-200 hover:bg-base-300",
                   )}
                 >
+                  {debtors.includes(member.user_address) && (
+                    <CheckIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2" />
+                  )}
                   <Address address={member.user_address as `0x${string}`} />
                 </button>
               ))}

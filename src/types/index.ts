@@ -1,10 +1,8 @@
-
 import { ReactNode } from "react";
 
-import {User} from "../app/db/users/interface";
+import { User } from "app/db/types";
 
 import type { NextPage } from "next";
-
 
 export enum PageAuth {
   Public, // Anyone can access
@@ -18,10 +16,10 @@ export type ExtendedPage<P = {}> = NextPage<P> & {
   auth?: PageAuth;
 };
 
-declare module 'next/server' {
+declare module "next/server" {
   export interface NextRequest {
-    id?: string
-    requestTime?: Date
-    user?: User
+    id?: string;
+    requestTime?: Date;
+    user?: User;
   }
 }

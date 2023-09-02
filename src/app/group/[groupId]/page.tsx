@@ -15,6 +15,8 @@ import { Spinner } from "@components/spinner";
 import { NewDepositModal } from "@components/transfers/new-deposit-modal";
 import { NewTransferModal } from "@components/transfers/new-transfer-modal";
 import { TransfersList } from "@components/transfers/transfers-list";
+import { getAddressExplorerLink } from "@constants/urls";
+import { useChainId } from "@hooks/use-chain-id";
 import { useCloseGroup } from "@lib/group/use-close-group";
 import { useGroupBalance } from "@lib/group/use-get-group-balance";
 import { useGroup } from "@lib/group/use-group";
@@ -32,6 +34,7 @@ interface GroupPageInnerProps {
 }
 const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   const { address } = useAccount();
+  const chainId = useChainId();
   const [newExpenseModalOpen, setNewExpenseModalOpen] = useState(false);
   const [newTransferModalOpen, setNewTransferModalOpen] = useState(false);
   const [newDepositModalOpen, setNewDepositModalOpen] = useState(false);
@@ -141,24 +144,28 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
 
   return (
     <div>
-      <div className="flex justify-between">
+      <div className="flex flex-col justify-between gap-4 md:flex-row">
         <div>
-          <div className="mb-4 flex items-center gap-2">
-            <h1 className="text-3xl font-bold">{group.name}</h1>
-            <Link
-              href={`https://goerli.etherscan.io/address/${group.address}`}
-              target="_blank"
-            >
-              <Address
-                className="rounded-box bg-secondary px-3 py-0.5 text-white"
-                address={group.address as `0x${string}`}
-              ></Address>
-            </Link>
-            {group.closed && (
-              <span className="rounded-box bg-info px-3 py-0.5">Closed</span>
-            )}
+          <div className="mb-4 flex flex-col gap-x-2 gap-y-4 sm:flex-row sm:items-center">
+            <h1 className="text-3xl font-bold sm:text-4xl">{group.name}</h1>
+            <div className="flex items-center gap-2">
+              <a
+                href={getAddressExplorerLink(chainId, group.address)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="rounded-box bg-secondary px-3 py-0.5 text-secondary-content">
+                  <Address address={group.address as `0x${string}`} />
+                </div>
+              </a>
+              {group.closed && (
+                <span className="rounded-box bg-info px-3 py-0.5 text-info-content">
+                  Closed
+                </span>
+              )}
+            </div>
           </div>
-          <span>Members: </span>
+          <span className="font-bold">Members: </span>
           {groupMembers.map((member, index) => (
             <Fragment key={member.user_address}>
               <span>
@@ -168,7 +175,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
             </Fragment>
           ))}
           <br />
-          <span>Pending Invites: </span>
+          <span className="font-bold">Pending Invites: </span>
           {invitedMembers.map((member, index) => (
             <Fragment key={member.user_address}>
               <span>
@@ -178,40 +185,44 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
             </Fragment>
           ))}
           <br />
-          {balance && <span>Balance: {balance} $ETH</span>}
+          {balance && (
+            <span className="font-bold">
+              Balance: <span className="font-normal">{balance} $ETH</span>
+            </span>
+          )}
         </div>
-        {currentUserStatus === "active" && (
-          <CopyButton text={`${window.location.origin}/join/${group.id}`}>
-            Copy Invite Link
-          </CopyButton>
-        )}
-
-        {currentUserStatus === "inactive" && (
+        <div className="mt-4 flex justify-start gap-2">
           <Button
-            onClick={onJoinGroup}
-            loading={isLoadingJoin}
-            disabled={isLoadingJoin || group.closed}
+            onClick={() => setNewDepositModalOpen(true)}
+            variant="outline"
           >
-            Join
+            Deposit
           </Button>
-        )}
+          <NewDepositModal
+            open={newDepositModalOpen}
+            onClose={() => setNewDepositModalOpen(false)}
+            group={group}
+            onCreate={onSuccess}
+          />
+          {currentUserStatus === "active" && (
+            <CopyButton text={`${window.location.origin}/join/${group.id}`}>
+              Copy Invite Link
+            </CopyButton>
+          )}
+
+          {currentUserStatus === "inactive" && (
+            <Button
+              onClick={onJoinGroup}
+              loading={isLoadingJoin}
+              disabled={isLoadingJoin || group.closed}
+            >
+              Join
+            </Button>
+          )}
+        </div>
       </div>
-      <div className="mt-4 flex justify-start gap-2">
-        <Button
-          className="bg-transparent text-primary outline outline-primary"
-          onClick={() => setNewDepositModalOpen(true)}
-        >
-          Deposit
-        </Button>
-        <NewDepositModal
-          open={newDepositModalOpen}
-          onClose={() => setNewDepositModalOpen(false)}
-          group={group}
-          onCreate={onSuccess}
-        />
-      </div>
-      <div className="mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
-        <h2 className=" text-2xl font-bold">Debts</h2>
+      <div className="mb-4 mt-10 flex flex-row items-center justify-between gap-6">
+        <h2 className="text-2xl font-bold">Debts</h2>
         <div>
           {!group.closed && currentUserStatus === "active" && (
             <div>
@@ -257,8 +268,8 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
         onSuccess={onSuccess}
         currentUserStatus={currentUserStatus || "inactive"}
       />
-      <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
-        <h2 className="mb-4 text-2xl font-bold">Expenses</h2>
+      <div className="mb-4 mt-10 flex flex-row items-center justify-between gap-6">
+        <h2 className="text-2xl font-bold">Expenses</h2>
         {currentUserStatus === "active" && (
           <Button
             rightIcon={<PlusIcon className="h-5 w-5" />}
@@ -279,8 +290,8 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
         onSuccess={onSuccess}
         currentUserStatus={currentUserStatus || ""}
       />
-      <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
-        <h2 className="mb-4 text-2xl font-bold">Transfers</h2>
+      <div className="mb-4 mt-10 flex flex-row items-center justify-between gap-6">
+        <h2 className="text-2xl font-bold">Transfers</h2>
         {currentUserStatus === "active" && (
           <Button
             rightIcon={<PlusIcon className="h-5 w-5" />}
@@ -320,14 +331,14 @@ export default function GroupPage({ params }: ProjectPageProps) {
   });
 
   return (
-    <div>
+    <div className="mt-4">
       <Link href="/groups" tabIndex={-1}>
         <Button
           leftIcon={<ArrowLeftIcon className="h-5 w-5" />}
           color="neutral"
           variant="outline"
           size="sm"
-          className="mb-8"
+          className="mb-4"
         >
           Back{" "}
         </Button>

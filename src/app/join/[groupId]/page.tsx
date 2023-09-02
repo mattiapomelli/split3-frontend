@@ -1,7 +1,7 @@
 "use client";
 
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
-import Link from "next/link";
+// import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+// import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Address } from "@components/address";
@@ -29,12 +29,22 @@ const JoinGroupPageInner = ({ group }: { group: GroupWithMembers }) => {
     });
   };
 
+  const membersCount = group.members.filter(
+    (member) => member.status === "active",
+  ).length;
+
   return (
-    <div>
-      <h1 className="mb-4 text-3xl font-bold">
+    <div className="rounded-box mx-auto mt-8 flex max-w-[500px] flex-col items-center gap-8 bg-base-200 p-4 text-center">
+      <p className="text-base-content-neutral">
         <Address address={group.owner as `0x${string}`} className="font-bold" />{" "}
-        invited you to join {group.name}
-      </h1>
+        invited you to join
+      </p>
+
+      <div>
+        <h1 className="mb-4 text-3xl font-bold">{group.name}</h1>
+        <p>{membersCount} members</p>
+      </div>
+
       <Button onClick={onJoinGroup} loading={isLoading} disabled={isLoading}>
         Join
       </Button>
@@ -49,7 +59,7 @@ export default function JoinGroupPage({ params }: ProjectPageProps) {
 
   return (
     <div>
-      <Link href="/" tabIndex={-1}>
+      {/* <Link href="/" tabIndex={-1}>
         <Button
           leftIcon={<ArrowLeftIcon className="h-5 w-5" />}
           color="neutral"
@@ -59,8 +69,14 @@ export default function JoinGroupPage({ params }: ProjectPageProps) {
         >
           Back{" "}
         </Button>
-      </Link>
-      {isLoading || !group ? <Spinner /> : <JoinGroupPageInner group={group} />}
+      </Link> */}
+      {isLoading || !group ? (
+        <div className="flex justify-center py-20">
+          <Spinner />
+        </div>
+      ) : (
+        <JoinGroupPageInner group={group} />
+      )}
     </div>
   );
 }

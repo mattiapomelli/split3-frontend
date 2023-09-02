@@ -102,42 +102,53 @@ export const ExpenseRow = ({
   return (
     <div
       className={cx(
-        "flex min-h-[4.625rem] flex-col gap-x-4 gap-y-5 border border-base-300 bg-base-100 px-5 py-8 md:flex-row md:items-center md:py-4 justify-between",
+        "flex min-h-[4.625rem] flex-col gap-x-4 gap-y-5 border border-base-300 bg-base-100 px-5 py-8 md:flex-row md:items-center md:py-4",
         className,
       )}
     >
-      <div className="flex flex-col gap-2 font-bold sm:flex-row sm:items-center">
+      <div className="flex min-w-[1px] flex-1 flex-col gap-2 font-bold sm:flex-row sm:items-center">
         {expense.title}
       </div>
 
-      <div>
-        <Address address={expense.user_address as `0x${string}`} /> paid{" "}
+      <div className="md:basis-[200px] lg:basis-[300px]">
+        <Address
+          className="font-semibold"
+          address={expense.user_address as `0x${string}`}
+        />{" "}
+        <i>paid </i>
         {expense.amount && (
-          <span className="font-medium">
+          <span className="font-semibold">
             {ethers.utils.formatEther(expense.amount.toString())} FAU
           </span>
         )}
       </div>
 
-      <div>
-        for{" "}
+      <div className="md:basis-[180px] lg:basis-[300px]">
+        <i>for </i>
         {debtorAddresses.map((user, index) => (
           <Fragment key={user}>
             <span>
-              <Address address={user as `0x${string}`} />
+              <Address
+                className="font-semibold"
+                address={user as `0x${string}`}
+              />
             </span>
             {index < debtorAddresses.length - 1 ? ", " : ""}
           </Fragment>
         ))}
       </div>
 
-      <div>
+      <div className="flex justify-end md:basis-[100px] lg:basis-[200px]">
         {transaction?.isExecuted ? (
-          "Approved"
+          <span className="rounded-box bg-primary/30 px-4 py-0.5">
+            Approved
+          </span>
         ) : (
-          <div>
-            {transaction?.confirmations?.length} /{" "}
-            {transaction?.confirmationsRequired} Signatures{" "}
+          <div className="flex-col gap-2">
+            <div>
+              {transaction?.confirmations?.length} /{" "}
+              {transaction?.confirmationsRequired} Signatures{" "}
+            </div>
             {!transaction?.isExecuted &&
               expense.user_address !== address?.toLowerCase() &&
               shouldShowApproveButton && (
