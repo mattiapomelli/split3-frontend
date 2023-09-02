@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
+import { ethers } from "ethers";
 import { useAccount, useNetwork, useSigner } from "wagmi";
 
+import { GroupAbi } from "@abis/group";
 import { createTransaction, proposeTransaction } from "@lib/safe";
 import { getSafe } from "@lib/safe/utils";
 import { parseAmount } from "@utils/amounts";
@@ -37,11 +39,14 @@ export const useTransferFromGroup = (
     }: TransferFromGroupData) => {
       if (!address || !signer || !chain) throw new Error("No address");
       const safe = await getSafe(group_owner, signer);
+      console.log(parseAmount(amount), recipient_address);
       const createTransferTx = await createTransaction(
         safe,
         group_contract,
-        "0x",
-        amount,
+        new ethers.utils.Interface(GroupAbi).encodeFunctionData("transfer", [
+          parseAmount(amount),
+          recipient_address,
+        ]),
       );
       const txHash = await proposeTransaction(
         signer,
@@ -50,13 +55,6 @@ export const useTransferFromGroup = (
         createTransferTx,
         address,
       );
-      console.log("Creating group transfer", {
-        group_id,
-        status: "pending",
-        tx_hash: txHash,
-        amount: parseAmount(amount).toNumber(),
-        recipient_address,
-      });
       await createGroupTransfer({
         group_id,
         status: "pending",

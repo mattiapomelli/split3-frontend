@@ -277,4 +277,45 @@ describe("SplitWiseGroup contract", function () {
       );
     });
   });
+
+  describe("Transfer from group", function () {
+    it("should transfer funds from the contract to the recipient", async function () {
+      const initialBalance = await member3.getBalance();
+      const amountToSend = ethers.utils.parseEther("0.25"); // Amount to send in Ether
+
+      // Send some Ether to the contract
+      await member5.sendTransaction({
+        value: ethers.utils.parseEther("0.5"),
+        to: splitWiseGroup.address,
+      });
+
+      // Check the contract's balance before the transfer
+      const contractBalanceBefore = await ethers.provider.getBalance(
+        splitWiseGroup.address,
+      );
+
+      expect(contractBalanceBefore).to.equal(ethers.utils.parseEther("0.5"));
+
+      // Call the transfer function
+      await splitWiseGroup.transfer(amountToSend, member3.address);
+
+      // Check the contract's balance after the transfer
+      const contractBalanceAfter = await ethers.provider.getBalance(
+        splitWiseGroup.address,
+      );
+
+      expect(contractBalanceAfter).to.equal(ethers.utils.parseEther("0.25")); // The contract balance should be empty after the transfer
+
+      // Check the recipient's balance after the transfer
+      const recipientBalanceAfter = await member3.getBalance();
+
+      expect(recipientBalanceAfter).to.equal(initialBalance.add(amountToSend)); // Recipient's balance should have increased by the transferred amount
+    });
+
+    it("should revert if the contract has no balance", async function () {
+      await expect(
+        splitWiseGroup.transfer(ethers.utils.parseEther("1"), member5.address),
+      ).to.be.revertedWith("Group has not enough balance");
+    });
+  });
 });

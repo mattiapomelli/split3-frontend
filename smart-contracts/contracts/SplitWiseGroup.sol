@@ -296,6 +296,11 @@ contract SplitWiseGroup {
         require(isMember(msg.sender), "Only active members can call this function");
     }
 
+    function transfer(uint256 amount, address recipient_address) external onlyOwner {
+        require(address(this).balance >= amount, "Group has not enough balance");
+        payable(address(recipient_address)).transfer(amount);
+    }
+
     // Fallback function to receive Ether
     receive() external payable {}
 }
