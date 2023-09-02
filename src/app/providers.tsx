@@ -8,16 +8,14 @@ import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
-import { CHAIN } from "@constants/chains";
+import { CHAINS } from "@constants/chains";
 import { env } from "env.mjs";
 
-const { chains, provider } = configureChains(
-  [CHAIN],
-  [
-    alchemyProvider({ apiKey: env.NEXT_PUBLIC_ALCHEMY_API_KEY }),
-    publicProvider(),
-  ],
-);
+// @ts-ignore
+const { chains, provider } = configureChains(CHAINS, [
+  alchemyProvider({ apiKey: env.NEXT_PUBLIC_ALCHEMY_API_KEY }),
+  publicProvider(),
+]);
 
 const { connectors } = getDefaultWallets({
   appName: "Web3 Boilerplate",

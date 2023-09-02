@@ -1,7 +1,7 @@
 import { NewGroupForm } from "@components/new-group-form";
 
 export const metadata = {
-  title: "Login",
+  title: "New Group",
 };
 
 export default function NewGroupPage() {

@@ -1,3 +1,2 @@
-export * from "./toast";
-export * from "./toaster";
-export * from "./use-toast";
+export { Toaster } from "./toaster";
+export { toast } from "./use-toast";
