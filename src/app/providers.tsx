@@ -1,22 +1,17 @@
-import "../styles/globals.css";
-import "@rainbow-me/rainbowkit/styles.css";
+"use client";
 
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { DefaultSeo } from "next-seo";
+
 import { ThemeProvider } from "next-themes";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
 import { CHAIN } from "@constants/chains";
-import { DefaultLayout } from "@layouts/default-layout";
 import { env } from "env.mjs";
 
-import SEO from "../../next-seo.config";
-
-import type { ExtendedPage } from "@types";
-import type { AppProps } from "next/app";
+import { ReactNode } from "react";
 
 const { chains, provider } = configureChains(
   [CHAIN],
@@ -40,23 +35,14 @@ const client = createClient({
 
 const queryClient = new QueryClient();
 
-function MyApp({ Component, pageProps }: AppProps) {
-  const getLayout =
-    (Component as ExtendedPage).getLayout ||
-    ((page) => <DefaultLayout>{page}</DefaultLayout>);
-
+export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <WagmiConfig client={client}>
         <RainbowKitProvider chains={chains}>
-          <ThemeProvider>
-            <DefaultSeo {...SEO} />
-            {getLayout(<Component {...pageProps} />)}
-          </ThemeProvider>
+          <ThemeProvider>{children}</ThemeProvider>
         </RainbowKitProvider>
       </WagmiConfig>
     </QueryClientProvider>
   );
 }
-
-export default MyApp;
