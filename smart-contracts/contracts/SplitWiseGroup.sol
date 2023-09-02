@@ -24,9 +24,12 @@ contract SplitWiseGroup {
     bool public isSettled;
 
     // Constructor to initialize the contract with required amount and initial members
-    constructor(uint256 _requiredAmount, address[] memory _members) {
+    constructor(uint256 _requiredAmount, address[] memory _members, address _owner) payable {
+        require(_members.length > 0, "At least one member is required");
+        require(msg.sender.balance >= _requiredAmount, "Insufficient balance");
+
         // Set the contract owner to the address deploying the contract
-        owner = msg.sender;
+        owner = _owner;
 
         // Set the required amount to join the group
         requiredAmount = _requiredAmount;
@@ -38,6 +41,8 @@ contract SplitWiseGroup {
         for (uint256 i = 0; i < _members.length; i++) {
             members[_members[i]] = MemberStatus.Inactive;
         }
+        members[msg.sender] = MemberStatus.Active;
+        activeMembers.push(msg.sender);
     }
 
     // Modifier to ensure only the contract owner can call a function

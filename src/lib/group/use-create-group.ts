@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { ethers, BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useAccount, useNetwork, useSigner } from "wagmi";
 
 import { GroupAbi, GroupBytecode } from "@abis/group";
+import { deploySafe } from "@lib/safe";
 import { supabaseClient } from "app/db";
 
 interface CreateGroupParams {
@@ -25,6 +26,9 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
     async ({ stakeAmount, initialMembers, name }: CreateGroupParams) => {
       if (!address || !signer || !chain) throw new Error("No address");
 
+      const safe = await deploySafe(signer, initialMembers);
+      const safeAddress = await safe.getAddress();
+
       // Deploy the contract
       const factory = new ethers.ContractFactory(
         GroupAbi,
@@ -43,7 +47,7 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
         .insert({
           address: contract.address,
           chain: chain?.name,
-          owner: address,
+          owner: safeAddress,
           required_amount: Number(stakeAmount.toString()),
           name,
         })
