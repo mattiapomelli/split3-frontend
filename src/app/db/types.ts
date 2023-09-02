@@ -9,6 +9,46 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      group_expenses: {
+        Row: {
+          amount: number | null;
+          creditor_user_addresses: string;
+          group_id: number | null;
+          id: number;
+          title: string | null;
+          user_address: string | null;
+        };
+        Insert: {
+          amount?: number | null;
+          creditor_user_addresses: string;
+          group_id?: number | null;
+          id?: number;
+          title?: string | null;
+          user_address?: string | null;
+        };
+        Update: {
+          amount?: number | null;
+          creditor_user_addresses?: string;
+          group_id?: number | null;
+          id?: number;
+          title?: string | null;
+          user_address?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "group_expenses_group_id_fkey";
+            columns: ["group_id"];
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "group_expenses_user_address_fkey";
+            columns: ["user_address"];
+            referencedRelation: "users";
+            referencedColumns: ["address"];
+          },
+        ];
+      };
       groups: {
         Row: {
           address: string;
@@ -36,57 +76,23 @@ export interface Database {
         };
         Relationships: [];
       };
-      group_expenses: {
-        Row: {
-          amount: number | null;
-          creditor_user_address: string;
-          group_id: number | null;
-          id: number;
-          user_address: string | null;
-        };
-        Insert: {
-          amount?: number | null;
-          creditor_user_address: string;
-          group_id?: number | null;
-          id?: number;
-          user_address?: string | null;
-        };
-        Update: {
-          amount?: number | null;
-          creditor_user_address?: string;
-          group_id?: number | null;
-          id?: number;
-          user_address?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "group_expenses_group_id_fkey";
-            columns: ["group_id"];
-            referencedRelation: "groups";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "group_expenses_user_address_fkey";
-            columns: ["user_address"];
-            referencedRelation: "users";
-            referencedColumns: ["address"];
-          },
-        ];
-      };
       user_has_group: {
         Row: {
           created_at: string;
           group_id: number;
+          status: string | null;
           user_address: string;
         };
         Insert: {
           created_at?: string;
           group_id: number;
+          status?: string | null;
           user_address: string;
         };
         Update: {
           created_at?: string;
           group_id?: number;
+          status?: string | null;
           user_address?: string;
         };
         Relationships: [
@@ -143,6 +149,10 @@ export type GroupWithMembers = Group & {
     user_address: string;
   }[];
 };
+export type GroupWithExpenses = GroupWithMembers & {
+  expenses: GroupExpense[];
+};
+
 export type CreateGroup = Database["public"]["Tables"]["groups"]["Insert"];
 
 export type UserHasGroup =

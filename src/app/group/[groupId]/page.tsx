@@ -1,42 +1,76 @@
 "use client";
 
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { ArrowLeftIcon, PlusIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
+import { Fragment, useState } from "react";
 
+import { Address } from "@components/address";
 import { Button } from "@components/basic/button";
 import { CopyButton } from "@components/copy-button";
+import { ExpensesList } from "@components/expenses/expenses-list";
+import { NewExpenseModal } from "@components/expenses/new-expense-modal";
 import { Spinner } from "@components/spinner";
 import { useGroup } from "@lib/group/use-group";
-import { GroupWithMembers } from "app/db/types";
+import { GroupWithExpenses } from "app/db/types";
 
-interface ProjectPageProps {
-  params: { groupId: string };
+interface GroupPageInnerProps {
+  group: GroupWithExpenses;
+  onCreate?: () => void;
 }
 
-const GroupPageInner = ({ group }: { group: GroupWithMembers }) => {
+const GroupPageInner = ({ group, onCreate }: GroupPageInnerProps) => {
+  const [newExpenseModalOpen, setNewExpenseModalOpen] = useState(false);
+
   return (
     <div>
       <div className="flex justify-between">
-        <h1 className="mb-4 text-3xl font-bold">{group.name}</h1>
+        <div>
+          <h1 className="mb-4 text-3xl font-bold">{group.name}</h1>
+          <span>Members: </span>
+          {group.members.map((member, index) => (
+            <Fragment key={member.user_address}>
+              <span>
+                <Address address={member.user_address as `0x${string}`} />
+              </span>
+              {index < group.members.length - 1 ? ", " : ""}
+            </Fragment>
+          ))}
+        </div>
         <CopyButton text={`http://localhost:3000/join/${group.id}`}>
           Copy Invite Link
         </CopyButton>
       </div>
-
-      <h3 className="text-lg font-bold">Members</h3>
-      <div>
-        {group.members.map((member) => (
-          <div key={member.user_address}>
-            <p>{member.user_address}</p>
-          </div>
-        ))}
+      <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+        <h2 className="mb-4 text-2xl font-bold">Expenses</h2>
+        <Button
+          rightIcon={<PlusIcon className="h-5 w-5" />}
+          onClick={() => setNewExpenseModalOpen(true)}
+        >
+          New Expense
+        </Button>
+        <NewExpenseModal
+          open={newExpenseModalOpen}
+          onClose={() => setNewExpenseModalOpen(false)}
+          group={group}
+          onCreate={onCreate}
+        />
       </div>
+      <ExpensesList group={group} />
     </div>
   );
 };
 
+interface ProjectPageProps {
+  params: { groupId: string };
+  onCreate?: () => void;
+}
+
 export default function GroupPage({ params }: ProjectPageProps) {
-  const { data: group, isLoading } = useGroup({
+  const {
+    data: group,
+    isLoading,
+    refetch,
+  } = useGroup({
     groupId: Number(params.groupId),
   });
 
@@ -53,7 +87,11 @@ export default function GroupPage({ params }: ProjectPageProps) {
           Back{" "}
         </Button>
       </Link>
-      {isLoading || !group ? <Spinner /> : <GroupPageInner group={group} />}
+      {isLoading || !group ? (
+        <Spinner />
+      ) : (
+        <GroupPageInner group={group} onCreate={refetch} />
+      )}
     </div>
   );
 }
