@@ -76,12 +76,12 @@ export const DebtRow = ({
       {userIsOwed ? (
         <p>
           <Address address={debt.debtor_address as `0x${string}`} /> owes you{" "}
-          <span className="font-medium">{debt.amount} USDC</span>
+          <span className="font-medium">{debt.amount} FAU</span>
         </p>
       ) : (
         <p>
           You owe <Address address={debt.creditor_address as `0x${string}`} />{" "}
-          <span className="font-medium">{debt.amount} USDC</span>
+          <span className="font-medium">{debt.amount} FAU</span>
         </p>
       )}
 

@@ -114,7 +114,7 @@ export const ExpenseRow = ({
         <Address address={expense.user_address as `0x${string}`} /> paid{" "}
         {expense.amount && (
           <span className="font-medium">
-            {ethers.utils.formatEther(expense.amount.toString())} USDC
+            {ethers.utils.formatEther(expense.amount.toString())} FAU
           </span>
         )}
       </div>
