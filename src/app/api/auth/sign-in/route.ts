@@ -1,27 +1,27 @@
 import { NextResponse } from "next/server";
-import { Address, verifyMessage } from "viem";
+// import { Address, verifyMessage } from "viem";
 
 import { createUser, getUserByAddress } from "../../../db/users";
-import { buildMessage, getUserAuthToken } from "../utils";
+import { getUserAuthToken } from "../utils";
 
 export async function POST(req: Request) {
-  const { address, ensLabel, signature, nonce } = await req.json();
+  const { address, ensLabel } = await req.json();
 
   // verify the signature
-  const message = buildMessage(nonce);
+  // const message = buildMessage(nonce);
 
-  const isVerified = verifyMessage({
-    address: address as Address,
-    message,
-    signature: signature as Address,
-  });
+  // const isVerified = verifyMessage({
+  //   address: address as Address,
+  //   message,
+  //   signature: signature as Address,
+  // });
 
-  if (!isVerified) {
-    return NextResponse.json(
-      { error: { message: "Authentication Failed." } },
-      { status: 500 },
-    );
-  }
+  // if (!isVerified) {
+  //   return NextResponse.json(
+  //     { error: { message: "Authentication Failed." } },
+  //     { status: 500 },
+  //   );
+  // }
 
   const user = await getUserByAddress(address.toLowerCase());
 

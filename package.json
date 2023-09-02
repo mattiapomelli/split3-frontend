@@ -39,7 +39,6 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.37.0",
     "tailwind-merge": "^1.8.0",
-    "viem": "^1.9.5",
     "wagmi": "^0.12.10",
     "zod": "^3.21.4"
   },
