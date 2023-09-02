@@ -11,6 +11,7 @@ import { DebtsList } from "@components/debts/debts-list";
 import { ExpensesList } from "@components/expenses/expenses-list";
 import { NewExpenseModal } from "@components/expenses/new-expense-modal";
 import { Spinner } from "@components/spinner";
+import { useCloseGroup } from "@lib/group/use-close-group";
 import { useGroup } from "@lib/group/use-group";
 import { GroupWithInfo } from "app/db/types";
 
@@ -21,6 +22,14 @@ interface GroupPageInnerProps {
 
 const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   const [newExpenseModalOpen, setNewExpenseModalOpen] = useState(false);
+
+  const { mutate: closeGroup } = useCloseGroup();
+
+  const onCloseGroup = () => {
+    closeGroup({
+      groupId: group.id,
+    });
+  };
 
   return (
     <div>
@@ -43,11 +52,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
       </div>
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <h2 className="mb-4 text-2xl font-bold">Debts</h2>
-        <Button
-        // onClick={() => setNewExpenseModalOpen(true)}
-        >
-          Close debts
-        </Button>
+        <Button onClick={onCloseGroup}>Close debts</Button>
       </div>
       <DebtsList group={group} onSuccess={onSuccess} />
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">

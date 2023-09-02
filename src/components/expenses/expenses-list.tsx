@@ -27,6 +27,7 @@ export const ExpensesList = ({ group }: ExpensesListProps) => {
         <ExpenseRow
           key={expense.id}
           expense={expense}
+          group={group}
           className={cx(
             { "-mt-px": index !== 0 },
             { "rounded-t-box": index === 0 },

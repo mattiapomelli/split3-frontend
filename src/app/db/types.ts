@@ -108,6 +108,7 @@ export interface Database {
         Row: {
           address: string;
           chain: string;
+          closed: boolean;
           creator_address: string | null;
           id: number;
           name: string;
@@ -117,6 +118,7 @@ export interface Database {
         Insert: {
           address: string;
           chain: string;
+          closed?: boolean;
           creator_address?: string | null;
           id?: number;
           name: string;
@@ -126,6 +128,7 @@ export interface Database {
         Update: {
           address?: string;
           chain?: string;
+          closed?: boolean;
           creator_address?: string | null;
           id?: number;
           name?: string;

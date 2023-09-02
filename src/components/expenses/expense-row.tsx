@@ -5,20 +5,39 @@ import { ethers } from "ethers";
 import { Fragment } from "react";
 
 import { Address } from "@components/address";
-import { GroupExpense } from "app/db/types";
+import { Button } from "@components/basic/button";
+import { useExecuteTransaction } from "@lib/safe/use-execute-transaction";
+import { useGetSafeTransaction } from "@lib/safe/use-get-safe-transacion";
+import { Group, GroupExpense } from "app/db/types";
 
 // import { PostModal } from "./post-modal";
 
 interface ExpenseRowProps {
   expense: GroupExpense;
-
+  group: Group;
   className?: string;
 }
 
-export const ExpenseRow = ({ expense, className }: ExpenseRowProps) => {
-  // const [modalOpen, setModalOpen] = useState(false);
+export const ExpenseRow = ({ expense, group, className }: ExpenseRowProps) => {
+  const { data: transaction } = useGetSafeTransaction({
+    txnHash: expense.tx_hash || "",
+  });
+
+  console.log("Transaction");
+
+  const { mutate: executeTransaction } = useExecuteTransaction();
+
+  const onExecuteTransaction = () => {
+    executeTransaction({
+      groupOwner: group.owner,
+      txnHash: expense.tx_hash || "",
+    });
+  };
 
   const debtorAddresses = expense.debtor_addresses.split(",");
+
+  const isThresholdReached =
+    transaction?.confirmations?.length === transaction?.confirmationsRequired;
 
   return (
     <div
@@ -50,6 +69,20 @@ export const ExpenseRow = ({ expense, className }: ExpenseRowProps) => {
             {index < debtorAddresses.length - 1 ? ", " : ""}
           </Fragment>
         ))}
+      </div>
+
+      <div>
+        {transaction?.isExecuted ? (
+          "Approved"
+        ) : (
+          <div>
+            {transaction?.confirmations?.length} /{" "}
+            {transaction?.confirmationsRequired} Confirmations{" "}
+            {isThresholdReached && (
+              <Button onClick={onExecuteTransaction}>Approve</Button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* <div className="hidden items-center md:flex md:basis-[120px] lg:basis-[200px]">

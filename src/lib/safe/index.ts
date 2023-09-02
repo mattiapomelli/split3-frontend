@@ -8,6 +8,7 @@ import Safe, {
   SafeFactory,
 } from "@safe-global/protocol-kit";
 import {
+  SafeMultisigTransactionResponse,
   SafeTransaction,
   SafeTransactionDataPartial,
 } from "@safe-global/safe-core-sdk-types";
@@ -104,4 +105,12 @@ export const getPendingTransactions = async (
 ): Promise<SafeMultisigTransactionListResponse> => {
   const safeService = getSafeService(signerOrProvider);
   return await safeService.getPendingTransactions(safeAddress);
+};
+
+export const getTransaction = async (
+  signerOrProvider: Signer | Provider,
+  txnHash: string,
+): Promise<SafeMultisigTransactionResponse> => {
+  const safeService = getSafeService(signerOrProvider);
+  return await safeService.getTransaction(txnHash);
 };

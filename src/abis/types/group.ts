@@ -14,7 +14,11 @@ import type {
   Signer,
   utils,
 } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
+import type {
+  FunctionFragment,
+  Result,
+  EventFragment,
+} from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type {
   TypedEventFilter,
@@ -24,13 +28,37 @@ import type {
   PromiseOrValue,
 } from "./common";
 
+export declare namespace SplitWiseGroup {
+  export type ExpenseStruct = {
+    payer: PromiseOrValue<string>;
+    name: PromiseOrValue<string>;
+    amount: PromiseOrValue<BigNumberish>;
+    debtor_addresses: PromiseOrValue<string>[];
+  };
+
+  export type ExpenseStructOutput = [string, string, BigNumber, string[]] & {
+    payer: string;
+    name: string;
+    amount: BigNumber;
+    debtor_addresses: string[];
+  };
+}
+
 export interface SplitWiseGroupInterface extends utils.Interface {
   functions: {
     "activeMembers(uint256)": FunctionFragment;
+    "addExpense(address,string,address[],uint256)": FunctionFragment;
     "addToWhitelist(address[])": FunctionFragment;
+    "close()": FunctionFragment;
+    "debts(address,address)": FunctionFragment;
+    "expenses(uint256)": FunctionFragment;
+    "expensesLength()": FunctionFragment;
     "getActiveMember(uint256)": FunctionFragment;
     "getActiveMembers()": FunctionFragment;
     "getActiveMembersCount()": FunctionFragment;
+    "getDebt(address,address)": FunctionFragment;
+    "getExpense(uint256)": FunctionFragment;
+    "isClosed()": FunctionFragment;
     "isMember(address)": FunctionFragment;
     "isSettled()": FunctionFragment;
     "isWhitelisted(address)": FunctionFragment;
@@ -41,6 +69,7 @@ export interface SplitWiseGroupInterface extends utils.Interface {
     "removeMember(address)": FunctionFragment;
     "requiredAmount()": FunctionFragment;
     "send(uint256,address)": FunctionFragment;
+    "settleDebt()": FunctionFragment;
     "settleGroup()": FunctionFragment;
     "stakes(address)": FunctionFragment;
   };
@@ -48,10 +77,18 @@ export interface SplitWiseGroupInterface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "activeMembers"
+      | "addExpense"
       | "addToWhitelist"
+      | "close"
+      | "debts"
+      | "expenses"
+      | "expensesLength"
       | "getActiveMember"
       | "getActiveMembers"
       | "getActiveMembersCount"
+      | "getDebt"
+      | "getExpense"
+      | "isClosed"
       | "isMember"
       | "isSettled"
       | "isWhitelisted"
@@ -62,6 +99,7 @@ export interface SplitWiseGroupInterface extends utils.Interface {
       | "removeMember"
       | "requiredAmount"
       | "send"
+      | "settleDebt"
       | "settleGroup"
       | "stakes",
   ): FunctionFragment;
@@ -71,8 +109,30 @@ export interface SplitWiseGroupInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>],
   ): string;
   encodeFunctionData(
+    functionFragment: "addExpense",
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<string>,
+      PromiseOrValue<string>[],
+      PromiseOrValue<BigNumberish>,
+    ],
+  ): string;
+  encodeFunctionData(
     functionFragment: "addToWhitelist",
     values: [PromiseOrValue<string>[]],
+  ): string;
+  encodeFunctionData(functionFragment: "close", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "debts",
+    values: [PromiseOrValue<string>, PromiseOrValue<string>],
+  ): string;
+  encodeFunctionData(
+    functionFragment: "expenses",
+    values: [PromiseOrValue<BigNumberish>],
+  ): string;
+  encodeFunctionData(
+    functionFragment: "expensesLength",
+    values?: undefined,
   ): string;
   encodeFunctionData(
     functionFragment: "getActiveMember",
@@ -86,6 +146,15 @@ export interface SplitWiseGroupInterface extends utils.Interface {
     functionFragment: "getActiveMembersCount",
     values?: undefined,
   ): string;
+  encodeFunctionData(
+    functionFragment: "getDebt",
+    values: [PromiseOrValue<string>, PromiseOrValue<string>],
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getExpense",
+    values: [PromiseOrValue<BigNumberish>],
+  ): string;
+  encodeFunctionData(functionFragment: "isClosed", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "isMember",
     values: [PromiseOrValue<string>],
@@ -118,6 +187,10 @@ export interface SplitWiseGroupInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>],
   ): string;
   encodeFunctionData(
+    functionFragment: "settleDebt",
+    values?: undefined,
+  ): string;
+  encodeFunctionData(
     functionFragment: "settleGroup",
     values?: undefined,
   ): string;
@@ -130,8 +203,16 @@ export interface SplitWiseGroupInterface extends utils.Interface {
     functionFragment: "activeMembers",
     data: BytesLike,
   ): Result;
+  decodeFunctionResult(functionFragment: "addExpense", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "addToWhitelist",
+    data: BytesLike,
+  ): Result;
+  decodeFunctionResult(functionFragment: "close", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "debts", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "expenses", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "expensesLength",
     data: BytesLike,
   ): Result;
   decodeFunctionResult(
@@ -146,6 +227,9 @@ export interface SplitWiseGroupInterface extends utils.Interface {
     functionFragment: "getActiveMembersCount",
     data: BytesLike,
   ): Result;
+  decodeFunctionResult(functionFragment: "getDebt", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getExpense", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isClosed", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isMember", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isSettled", data: BytesLike): Result;
   decodeFunctionResult(
@@ -168,14 +252,33 @@ export interface SplitWiseGroupInterface extends utils.Interface {
     data: BytesLike,
   ): Result;
   decodeFunctionResult(functionFragment: "send", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "settleDebt", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "settleGroup",
     data: BytesLike,
   ): Result;
   decodeFunctionResult(functionFragment: "stakes", data: BytesLike): Result;
 
-  events: {};
+  events: {
+    "ExpenseAdded(uint256,address,uint256,string,address[])": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "ExpenseAdded"): EventFragment;
 }
+
+export interface ExpenseAddedEventObject {
+  expenseIndex: BigNumber;
+  payer: string;
+  amount: BigNumber;
+  name: string;
+  debtor_addresses: string[];
+}
+export type ExpenseAddedEvent = TypedEvent<
+  [BigNumber, string, BigNumber, string, string[]],
+  ExpenseAddedEventObject
+>;
+
+export type ExpenseAddedEventFilter = TypedEventFilter<ExpenseAddedEvent>;
 
 export interface SplitWiseGroup extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -209,10 +312,41 @@ export interface SplitWiseGroup extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<[string]>;
 
+    addExpense(
+      _payer: PromiseOrValue<string>,
+      _name: PromiseOrValue<string>,
+      _debtor_addresses: PromiseOrValue<string>[],
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> },
+    ): Promise<ContractTransaction>;
+
     addToWhitelist(
       newMembers: PromiseOrValue<string>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> },
     ): Promise<ContractTransaction>;
+
+    close(
+      overrides?: Overrides & { from?: PromiseOrValue<string> },
+    ): Promise<ContractTransaction>;
+
+    debts(
+      arg0: PromiseOrValue<string>,
+      arg1: PromiseOrValue<string>,
+      overrides?: CallOverrides,
+    ): Promise<[BigNumber]>;
+
+    expenses(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides,
+    ): Promise<
+      [string, string, BigNumber] & {
+        payer: string;
+        name: string;
+        amount: BigNumber;
+      }
+    >;
+
+    expensesLength(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getActiveMember(
       index: PromiseOrValue<BigNumberish>,
@@ -222,6 +356,19 @@ export interface SplitWiseGroup extends BaseContract {
     getActiveMembers(overrides?: CallOverrides): Promise<[string[]]>;
 
     getActiveMembersCount(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getDebt(
+      debtor: PromiseOrValue<string>,
+      creditor: PromiseOrValue<string>,
+      overrides?: CallOverrides,
+    ): Promise<[BigNumber]>;
+
+    getExpense(
+      index: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides,
+    ): Promise<[SplitWiseGroup.ExpenseStructOutput]>;
+
+    isClosed(overrides?: CallOverrides): Promise<[boolean]>;
 
     isMember(
       member: PromiseOrValue<string>,
@@ -264,6 +411,8 @@ export interface SplitWiseGroup extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
     ): Promise<ContractTransaction>;
 
+    settleDebt(overrides?: CallOverrides): Promise<[void]>;
+
     settleGroup(
       overrides?: Overrides & { from?: PromiseOrValue<string> },
     ): Promise<ContractTransaction>;
@@ -279,10 +428,41 @@ export interface SplitWiseGroup extends BaseContract {
     overrides?: CallOverrides,
   ): Promise<string>;
 
+  addExpense(
+    _payer: PromiseOrValue<string>,
+    _name: PromiseOrValue<string>,
+    _debtor_addresses: PromiseOrValue<string>[],
+    _amount: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> },
+  ): Promise<ContractTransaction>;
+
   addToWhitelist(
     newMembers: PromiseOrValue<string>[],
     overrides?: Overrides & { from?: PromiseOrValue<string> },
   ): Promise<ContractTransaction>;
+
+  close(
+    overrides?: Overrides & { from?: PromiseOrValue<string> },
+  ): Promise<ContractTransaction>;
+
+  debts(
+    arg0: PromiseOrValue<string>,
+    arg1: PromiseOrValue<string>,
+    overrides?: CallOverrides,
+  ): Promise<BigNumber>;
+
+  expenses(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides,
+  ): Promise<
+    [string, string, BigNumber] & {
+      payer: string;
+      name: string;
+      amount: BigNumber;
+    }
+  >;
+
+  expensesLength(overrides?: CallOverrides): Promise<BigNumber>;
 
   getActiveMember(
     index: PromiseOrValue<BigNumberish>,
@@ -292,6 +472,19 @@ export interface SplitWiseGroup extends BaseContract {
   getActiveMembers(overrides?: CallOverrides): Promise<string[]>;
 
   getActiveMembersCount(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getDebt(
+    debtor: PromiseOrValue<string>,
+    creditor: PromiseOrValue<string>,
+    overrides?: CallOverrides,
+  ): Promise<BigNumber>;
+
+  getExpense(
+    index: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides,
+  ): Promise<SplitWiseGroup.ExpenseStructOutput>;
+
+  isClosed(overrides?: CallOverrides): Promise<boolean>;
 
   isMember(
     member: PromiseOrValue<string>,
@@ -334,6 +527,8 @@ export interface SplitWiseGroup extends BaseContract {
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
   ): Promise<ContractTransaction>;
 
+  settleDebt(overrides?: CallOverrides): Promise<void>;
+
   settleGroup(
     overrides?: Overrides & { from?: PromiseOrValue<string> },
   ): Promise<ContractTransaction>;
@@ -349,10 +544,39 @@ export interface SplitWiseGroup extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<string>;
 
+    addExpense(
+      _payer: PromiseOrValue<string>,
+      _name: PromiseOrValue<string>,
+      _debtor_addresses: PromiseOrValue<string>[],
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides,
+    ): Promise<void>;
+
     addToWhitelist(
       newMembers: PromiseOrValue<string>[],
       overrides?: CallOverrides,
     ): Promise<void>;
+
+    close(overrides?: CallOverrides): Promise<void>;
+
+    debts(
+      arg0: PromiseOrValue<string>,
+      arg1: PromiseOrValue<string>,
+      overrides?: CallOverrides,
+    ): Promise<BigNumber>;
+
+    expenses(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides,
+    ): Promise<
+      [string, string, BigNumber] & {
+        payer: string;
+        name: string;
+        amount: BigNumber;
+      }
+    >;
+
+    expensesLength(overrides?: CallOverrides): Promise<BigNumber>;
 
     getActiveMember(
       index: PromiseOrValue<BigNumberish>,
@@ -362,6 +586,19 @@ export interface SplitWiseGroup extends BaseContract {
     getActiveMembers(overrides?: CallOverrides): Promise<string[]>;
 
     getActiveMembersCount(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getDebt(
+      debtor: PromiseOrValue<string>,
+      creditor: PromiseOrValue<string>,
+      overrides?: CallOverrides,
+    ): Promise<BigNumber>;
+
+    getExpense(
+      index: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides,
+    ): Promise<SplitWiseGroup.ExpenseStructOutput>;
+
+    isClosed(overrides?: CallOverrides): Promise<boolean>;
 
     isMember(
       member: PromiseOrValue<string>,
@@ -402,6 +639,8 @@ export interface SplitWiseGroup extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<void>;
 
+    settleDebt(overrides?: CallOverrides): Promise<void>;
+
     settleGroup(overrides?: CallOverrides): Promise<void>;
 
     stakes(
@@ -410,7 +649,22 @@ export interface SplitWiseGroup extends BaseContract {
     ): Promise<BigNumber>;
   };
 
-  filters: {};
+  filters: {
+    "ExpenseAdded(uint256,address,uint256,string,address[])"(
+      expenseIndex?: null,
+      payer?: null,
+      amount?: null,
+      name?: null,
+      debtor_addresses?: null,
+    ): ExpenseAddedEventFilter;
+    ExpenseAdded(
+      expenseIndex?: null,
+      payer?: null,
+      amount?: null,
+      name?: null,
+      debtor_addresses?: null,
+    ): ExpenseAddedEventFilter;
+  };
 
   estimateGas: {
     activeMembers(
@@ -418,10 +672,35 @@ export interface SplitWiseGroup extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<BigNumber>;
 
+    addExpense(
+      _payer: PromiseOrValue<string>,
+      _name: PromiseOrValue<string>,
+      _debtor_addresses: PromiseOrValue<string>[],
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> },
+    ): Promise<BigNumber>;
+
     addToWhitelist(
       newMembers: PromiseOrValue<string>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> },
     ): Promise<BigNumber>;
+
+    close(
+      overrides?: Overrides & { from?: PromiseOrValue<string> },
+    ): Promise<BigNumber>;
+
+    debts(
+      arg0: PromiseOrValue<string>,
+      arg1: PromiseOrValue<string>,
+      overrides?: CallOverrides,
+    ): Promise<BigNumber>;
+
+    expenses(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides,
+    ): Promise<BigNumber>;
+
+    expensesLength(overrides?: CallOverrides): Promise<BigNumber>;
 
     getActiveMember(
       index: PromiseOrValue<BigNumberish>,
@@ -431,6 +710,19 @@ export interface SplitWiseGroup extends BaseContract {
     getActiveMembers(overrides?: CallOverrides): Promise<BigNumber>;
 
     getActiveMembersCount(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getDebt(
+      debtor: PromiseOrValue<string>,
+      creditor: PromiseOrValue<string>,
+      overrides?: CallOverrides,
+    ): Promise<BigNumber>;
+
+    getExpense(
+      index: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides,
+    ): Promise<BigNumber>;
+
+    isClosed(overrides?: CallOverrides): Promise<BigNumber>;
 
     isMember(
       member: PromiseOrValue<string>,
@@ -473,6 +765,8 @@ export interface SplitWiseGroup extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
     ): Promise<BigNumber>;
 
+    settleDebt(overrides?: CallOverrides): Promise<BigNumber>;
+
     settleGroup(
       overrides?: Overrides & { from?: PromiseOrValue<string> },
     ): Promise<BigNumber>;
@@ -489,10 +783,35 @@ export interface SplitWiseGroup extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
 
+    addExpense(
+      _payer: PromiseOrValue<string>,
+      _name: PromiseOrValue<string>,
+      _debtor_addresses: PromiseOrValue<string>[],
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> },
+    ): Promise<PopulatedTransaction>;
+
     addToWhitelist(
       newMembers: PromiseOrValue<string>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> },
     ): Promise<PopulatedTransaction>;
+
+    close(
+      overrides?: Overrides & { from?: PromiseOrValue<string> },
+    ): Promise<PopulatedTransaction>;
+
+    debts(
+      arg0: PromiseOrValue<string>,
+      arg1: PromiseOrValue<string>,
+      overrides?: CallOverrides,
+    ): Promise<PopulatedTransaction>;
+
+    expenses(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides,
+    ): Promise<PopulatedTransaction>;
+
+    expensesLength(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getActiveMember(
       index: PromiseOrValue<BigNumberish>,
@@ -504,6 +823,19 @@ export interface SplitWiseGroup extends BaseContract {
     getActiveMembersCount(
       overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
+
+    getDebt(
+      debtor: PromiseOrValue<string>,
+      creditor: PromiseOrValue<string>,
+      overrides?: CallOverrides,
+    ): Promise<PopulatedTransaction>;
+
+    getExpense(
+      index: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides,
+    ): Promise<PopulatedTransaction>;
+
+    isClosed(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isMember(
       member: PromiseOrValue<string>,
@@ -545,6 +877,8 @@ export interface SplitWiseGroup extends BaseContract {
       recipient: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
     ): Promise<PopulatedTransaction>;
+
+    settleDebt(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     settleGroup(
       overrides?: Overrides & { from?: PromiseOrValue<string> },
