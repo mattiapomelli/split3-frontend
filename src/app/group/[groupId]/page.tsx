@@ -12,10 +12,10 @@ import { DebtsList } from "@components/debts/debts-list";
 import { ExpensesList } from "@components/expenses/expenses-list";
 import { NewExpenseModal } from "@components/expenses/new-expense-modal";
 import { Spinner } from "@components/spinner";
+import { NewDepositModal } from "@components/transfers/new-deposit-modal";
 import { NewTransferModal } from "@components/transfers/new-transfer-modal";
 import { TransfersList } from "@components/transfers/transfers-list";
 import { useCloseGroup } from "@lib/group/use-close-group";
-import { useDepositToGroup } from "@lib/group/use-deposit-to-group";
 import { useGroupBalance } from "@lib/group/use-get-group-balance";
 import { useGroup } from "@lib/group/use-group";
 import { useJoinGroup } from "@lib/group/use-join-group";
@@ -34,6 +34,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   const { address } = useAccount();
   const [newExpenseModalOpen, setNewExpenseModalOpen] = useState(false);
   const [newTransferModalOpen, setNewTransferModalOpen] = useState(false);
+  const [newDepositModalOpen, setNewDepositModalOpen] = useState(false);
 
   const { data: transaction, refetch } = useGetSafeTransaction({
     txnHash: group.close_txn_hash || "",
@@ -132,20 +133,6 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
     },
   });
 
-  const { mutate: depositToGroup, isLoading: isLoadingDeposit } =
-    useDepositToGroup({
-      onSuccess() {
-        console.log("Deposit to group success");
-      },
-    });
-
-  const onDepositToGroup = async () => {
-    depositToGroup({
-      group_contract: group.address,
-      amount: "0.001",
-    });
-  };
-
   const onJoinGroup = async () => {
     joinGroup({
       groupId: group.id,
@@ -210,14 +197,18 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
         )}
       </div>
       <div className="mt-4 flex justify-start gap-2">
-        <Button>Transfer</Button>
         <Button
           className="bg-transparent text-primary outline outline-primary"
-          onClick={onDepositToGroup}
-          loading={isLoadingDeposit}
+          onClick={() => setNewDepositModalOpen(true)}
         >
           Deposit
         </Button>
+        <NewDepositModal
+          open={newDepositModalOpen}
+          onClose={() => setNewDepositModalOpen(false)}
+          group={group}
+          onCreate={onSuccess}
+        />
       </div>
       <div className="mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <h2 className=" text-2xl font-bold">Debts</h2>
