@@ -9,6 +9,49 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      debts: {
+        Row: {
+          amount: number;
+          creditor_address: string | null;
+          debtor_address: string | null;
+          group_id: number;
+          id: number;
+        };
+        Insert: {
+          amount?: number;
+          creditor_address?: string | null;
+          debtor_address?: string | null;
+          group_id: number;
+          id?: number;
+        };
+        Update: {
+          amount?: number;
+          creditor_address?: string | null;
+          debtor_address?: string | null;
+          group_id?: number;
+          id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "debts_creditor_address_fkey";
+            columns: ["creditor_address"];
+            referencedRelation: "users";
+            referencedColumns: ["address"];
+          },
+          {
+            foreignKeyName: "debts_debtor_address_fkey";
+            columns: ["debtor_address"];
+            referencedRelation: "users";
+            referencedColumns: ["address"];
+          },
+          {
+            foreignKeyName: "debts_group_id_fkey";
+            columns: ["group_id"];
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       group_expenses: {
         Row: {
           amount: number | null;
@@ -149,8 +192,9 @@ export type GroupWithMembers = Group & {
     user_address: string;
   }[];
 };
-export type GroupWithExpenses = GroupWithMembers & {
+export type GroupWithInfo = GroupWithMembers & {
   expenses: GroupExpense[];
+  debts: Debt[];
 };
 
 export type CreateGroup = Database["public"]["Tables"]["groups"]["Insert"];
@@ -164,3 +208,6 @@ export type GroupExpense =
   Database["public"]["Tables"]["group_expenses"]["Row"];
 export type CreateGroupExpense =
   Database["public"]["Tables"]["group_expenses"]["Insert"];
+
+export type Debt = Database["public"]["Tables"]["debts"]["Row"];
+export type CreateDebt = Database["public"]["Tables"]["debts"]["Insert"];

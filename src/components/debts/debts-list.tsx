@@ -5,28 +5,28 @@ import cx from "classnames";
 
 import { GroupWithInfo } from "app/db/types";
 
-import { ExpenseRow } from "./expense-row";
+import { DebtRow } from "./debt-row";
 
 interface ExpensesListProps {
   group: GroupWithInfo;
 }
 
-export const ExpensesList = ({ group }: ExpensesListProps) => {
+export const DebtsList = ({ group }: ExpensesListProps) => {
   // const [modalOpen, setModalOpen] = useState(false);
 
-  if (!group.expenses.length)
+  if (!group.debts.length)
     return (
       <div className="rounded-box mt-6 border border-base-300 py-14 text-center">
-        No expenses yet
+        No debts yet
       </div>
     );
 
   return (
     <div className="flex flex-col">
-      {group.expenses.map((expense, index) => (
-        <ExpenseRow
-          key={expense.id}
-          expense={expense}
+      {group.debts.map((debt, index) => (
+        <DebtRow
+          key={debt.id}
+          debt={debt}
           className={cx(
             { "-mt-px": index !== 0 },
             { "rounded-t-box": index === 0 },

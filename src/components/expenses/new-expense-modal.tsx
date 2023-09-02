@@ -12,7 +12,7 @@ import { Input } from "@components/basic/input";
 import { Label } from "@components/basic/label";
 import { BaseModalProps, Modal } from "@components/basic/modal";
 import { useCreateExpense } from "@lib/expenses/use-create-expense";
-import { GroupWithExpenses } from "app/db/types";
+import { GroupWithInfo } from "app/db/types";
 
 const newExpenseSchema = z.object({
   title: z.string().min(1),
@@ -22,7 +22,7 @@ const newExpenseSchema = z.object({
 type NewExpenseData = z.infer<typeof newExpenseSchema>;
 
 interface NewPostModalProps extends BaseModalProps {
-  group: GroupWithExpenses;
+  group: GroupWithInfo;
   onCreate?: () => void;
 }
 

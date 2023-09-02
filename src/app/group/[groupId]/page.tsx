@@ -7,14 +7,15 @@ import { Fragment, useState } from "react";
 import { Address } from "@components/address";
 import { Button } from "@components/basic/button";
 import { CopyButton } from "@components/copy-button";
+import { DebtsList } from "@components/debts/debts-list";
 import { ExpensesList } from "@components/expenses/expenses-list";
 import { NewExpenseModal } from "@components/expenses/new-expense-modal";
 import { Spinner } from "@components/spinner";
 import { useGroup } from "@lib/group/use-group";
-import { GroupWithExpenses } from "app/db/types";
+import { GroupWithInfo } from "app/db/types";
 
 interface GroupPageInnerProps {
-  group: GroupWithExpenses;
+  group: GroupWithInfo;
   onCreate?: () => void;
 }
 
@@ -48,7 +49,7 @@ const GroupPageInner = ({ group, onCreate }: GroupPageInnerProps) => {
           Close debts
         </Button>
       </div>
-      <ExpensesList group={group} />
+      <DebtsList group={group} />
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <h2 className="mb-4 text-2xl font-bold">Expenses</h2>
         <Button
