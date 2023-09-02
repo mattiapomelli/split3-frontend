@@ -104,6 +104,36 @@ export interface Database {
           },
         ];
       };
+      group_transfers: {
+        Row: {
+          amount: number | null;
+          created_at: string;
+          group_id: number;
+          id: number;
+          recipient_address: string;
+          status: string | null;
+          tx_hash: string | null;
+        };
+        Insert: {
+          amount?: number | null;
+          created_at?: string;
+          group_id?: number;
+          id?: number;
+          recipient_address: string;
+          status?: string | null;
+          tx_hash?: string | null;
+        };
+        Update: {
+          amount?: number | null;
+          created_at?: string;
+          group_id?: number;
+          id?: number;
+          recipient_address?: string;
+          status?: string | null;
+          tx_hash?: string | null;
+        };
+        Relationships: [];
+      };
       groups: {
         Row: {
           address: string;
@@ -233,3 +263,8 @@ export type CreateGroupExpense =
 
 export type Debt = Database["public"]["Tables"]["debts"]["Row"];
 export type CreateDebt = Database["public"]["Tables"]["debts"]["Insert"];
+
+export type GroupTransfer =
+  Database["public"]["Tables"]["group_transfers"]["Row"];
+export type CreateGroupTransfer =
+  Database["public"]["Tables"]["group_transfers"]["Insert"];

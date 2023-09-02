@@ -32,16 +32,12 @@ export const useSyncGroupDebts = (options?: UseSyncGroupDebtsOptions) => {
       ];
 
       for await (const m1 of expenseMembers) {
-        console.log("Member:", m1);
-
         const otherMembers = expenseMembers.filter(
           (m) => m.toLowerCase() !== m1.toLowerCase(),
         );
 
         for await (const m2 of otherMembers) {
           const debt = await GroupContract.getDebt(m1, m2);
-
-          console.log("Debt:", debt);
 
           const amount = Number(formatAmount(Number(debt.toString())));
           await upsertDebt(

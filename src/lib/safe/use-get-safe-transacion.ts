@@ -13,10 +13,10 @@ export const useGetSafeTransaction = ({
   const { address } = useAccount();
   const provider = useProvider();
   const { data: signer } = useSigner();
-
   return useQuery({
     queryKey: ["safe-transaction", txnHash],
     queryFn: async () => {
+      if (!txnHash) throw new Error("No txn hash");
       if (!address) throw new Error("No address");
       return await getTransaction(signer ?? provider, txnHash);
     },

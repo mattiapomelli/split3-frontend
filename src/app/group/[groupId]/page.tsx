@@ -14,6 +14,8 @@ import { ExpensesList } from "@components/expenses/expenses-list";
 import { NewExpenseModal } from "@components/expenses/new-expense-modal";
 import { Spinner } from "@components/spinner";
 import { useCloseGroup } from "@lib/group/use-close-group";
+import { useDepositToGroup } from "@lib/group/use-deposit-to-group";
+import { useGroupBalance } from "@lib/group/use-get-group-balance";
 import { useGroup } from "@lib/group/use-group";
 import { useJoinGroup } from "@lib/group/use-join-group";
 import { useSetGroupClosed } from "@lib/group/use-set-group-closed";
@@ -36,6 +38,8 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   const { data: transaction, refetch } = useGetSafeTransaction({
     txnHash: group.close_txn_hash || "",
   });
+
+  const { data: balance } = useGroupBalance({ groupAddress: group.address });
 
   const hasConfirmed = transaction?.confirmations?.find(
     (confirmation) =>
@@ -127,6 +131,20 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
     },
   });
 
+  const { mutate: depositToGroup, isLoading: isLoadingDeposit } =
+    useDepositToGroup({
+      onSuccess() {
+        console.log("Deposit to group success");
+      },
+    });
+
+  const onDepositToGroup = async () => {
+    depositToGroup({
+      group_contract: group.address,
+      amount: "0.001",
+    });
+  };
+
   const onJoinGroup = async () => {
     joinGroup({
       groupId: group.id,
@@ -139,6 +157,15 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
         <div>
           <div className="mb-4 flex items-center gap-2">
             <h1 className="text-3xl font-bold">{group.name}</h1>
+            <Link
+              href={`https://goerli.etherscan.io/address/${group.address}`}
+              target="_blank"
+            >
+              <Address
+                className="rounded-box bg-secondary px-3 py-0.5 text-white"
+                address={group.address as `0x${string}`}
+              ></Address>
+            </Link>
             {group.closed && (
               <span className="rounded-box bg-info px-3 py-0.5">Closed</span>
             )}
@@ -162,6 +189,8 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
               {index < invitedMembers.length - 1 ? ", " : ""}
             </Fragment>
           ))}
+          <br />
+          {balance && <span>Balance: {balance} $ETH</span>}
         </div>
         {currentUserStatus === "active" ? (
           <CopyButton text={`http://localhost:3000/join/${group.id}`}>
@@ -176,6 +205,16 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
             Join
           </Button>
         )}
+      </div>
+      <div className="mt-4 flex justify-start gap-2">
+        <Button>Transfer</Button>
+        <Button
+          className="bg-transparent text-primary outline outline-primary"
+          onClick={onDepositToGroup}
+          loading={isLoadingDeposit}
+        >
+          Deposit
+        </Button>
       </div>
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <h2 className="mb-4 text-2xl font-bold">Debts</h2>
