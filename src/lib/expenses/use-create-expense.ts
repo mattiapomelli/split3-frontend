@@ -5,7 +5,6 @@ import { useAccount, useNetwork, useSigner } from "wagmi";
 import { GroupAbi } from "@abis/group";
 import { createTransaction, proposeTransaction } from "@lib/safe";
 import { getSafe } from "@lib/safe/utils";
-import { parseAmount } from "@utils/amounts";
 import { createExpense } from "app/db/expenses";
 import { CreateGroupExpense } from "app/db/types";
 

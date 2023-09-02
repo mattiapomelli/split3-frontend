@@ -26,6 +26,8 @@ export const DebtsList = ({
       debt.creditor_address === address?.toLowerCase(),
   );
 
+  const nonZeroDebts = userDebts.filter((debt) => debt.amount !== 0);
+
   if (!userDebts.length)
     return (
       <div className="rounded-box mt-6 border border-base-300 py-14 text-center">
@@ -35,7 +37,7 @@ export const DebtsList = ({
 
   return (
     <div className="flex flex-col">
-      {userDebts.map((debt, index) => (
+      {nonZeroDebts.map((debt, index) => (
         <DebtRow
           key={debt.id}
           debt={debt}
@@ -45,7 +47,7 @@ export const DebtsList = ({
           className={cx(
             { "-mt-px": index !== 0 },
             { "rounded-t-box": index === 0 },
-            { "rounded-b-box": index === userDebts.length - 1 },
+            { "rounded-b-box": index === nonZeroDebts.length - 1 },
           )}
         />
       ))}

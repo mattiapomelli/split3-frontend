@@ -3,11 +3,15 @@ import { ethers } from "ethers";
 import { useAccount, useSigner } from "wagmi";
 
 import { GroupAbi } from "@abis/group";
-import { createTransaction } from "@lib/safe";
+import { createTransaction, proposeTransaction } from "@lib/safe";
 import { getSafe } from "@lib/safe/utils";
 import { supabaseClient } from "app/db";
 
-import { getGroupContract } from "./get-group-contract";
+type CreateExpenseData = {
+  groupId: number;
+  group_owner: string;
+  group_contract: string;
+};
 
 interface UseCreateRequestOptions {
   onSuccess?: () => void;
@@ -19,48 +23,29 @@ export const useCloseGroup = (options?: UseCreateRequestOptions) => {
   const { data: signer } = useSigner();
 
   return useMutation(
-    async ({ groupId }: { groupId: number; group_owner: string }) => {
+    async ({ groupId, group_owner, group_contract }: CreateExpenseData) => {
       if (!address || !signer) throw new Error("No address");
 
       const safe = await getSafe(group_owner, signer);
       const closeGroupTx = await createTransaction(
         safe,
         group_contract,
-        new ethers.utils.Interface(GroupAbi).encodeFunctionData("addExpense", [
-          payer_address, // address _payer,
-          rest.title, // string _name,
-          rest.debtor_addresses.split(","), // address[] calldata _debtor_address,
-          parseAmount(amount.toString()),
-        ]),
+        new ethers.utils.Interface(GroupAbi).encodeFunctionData("close"),
       );
       const txHash = await proposeTransaction(
         signer,
         safe,
         group_owner,
-        createExpenseTx,
+        closeGroupTx,
         address,
       );
 
-      const { data: group, error } = await supabaseClient
+      const { error } = await supabaseClient
         .from("groups")
-        .select("*")
-        .eq("id", groupId)
-        .single();
+        .update({ close_txn_hash: txHash })
+        .eq("id", groupId);
+
       if (error) throw error;
-
-      const groupContract = getGroupContract(group.address, signer);
-      const tx = await groupContract.close();
-
-      await tx.wait();
-
-      const { error: error2 } = await supabaseClient
-        .from("groups")
-        .update({
-          closed: true,
-        })
-        .eq("group_id", groupId);
-
-      if (error2) throw error2;
     },
     {
       onSuccess: options?.onSuccess,

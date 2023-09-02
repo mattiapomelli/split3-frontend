@@ -10,14 +10,14 @@ import { ExpenseRow } from "./expense-row";
 interface ExpensesListProps {
   group: GroupWithInfo;
   currentUserStatus?: string;
+  onSuccess?: () => void;
 }
 
 export const ExpensesList = ({
   group,
+  onSuccess,
   currentUserStatus,
 }: ExpensesListProps) => {
-  // const [modalOpen, setModalOpen] = useState(false);
-
   if (!group.expenses.length)
     return (
       <div className="rounded-box mt-6 border border-base-300 py-14 text-center">
@@ -33,6 +33,7 @@ export const ExpensesList = ({
           expense={expense}
           group={group}
           shouldShowApproveButton={currentUserStatus === "active"}
+          onSuccess={onSuccess}
           className={cx(
             { "-mt-px": index !== 0 },
             { "rounded-t-box": index === 0 },

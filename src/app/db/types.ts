@@ -108,6 +108,7 @@ export interface Database {
         Row: {
           address: string;
           chain: string;
+          close_txn_hash: string | null;
           closed: boolean;
           creator_address: string | null;
           id: number;
@@ -118,6 +119,7 @@ export interface Database {
         Insert: {
           address: string;
           chain: string;
+          close_txn_hash?: string | null;
           closed?: boolean;
           creator_address?: string | null;
           id?: number;
@@ -128,6 +130,7 @@ export interface Database {
         Update: {
           address?: string;
           chain?: string;
+          close_txn_hash?: string | null;
           closed?: boolean;
           creator_address?: string | null;
           id?: number;
@@ -208,7 +211,7 @@ export type Group = Database["public"]["Tables"]["groups"]["Row"];
 export type GroupWithMembers = Group & {
   members: {
     user_address: string;
-    status: string;
+    status: string | null;
   }[];
 };
 export type GroupWithInfo = GroupWithMembers & {

@@ -16,6 +16,11 @@ import { Spinner } from "@components/spinner";
 import { useCloseGroup } from "@lib/group/use-close-group";
 import { useGroup } from "@lib/group/use-group";
 import { useJoinGroup } from "@lib/group/use-join-group";
+import { useSetGroupClosed } from "@lib/group/use-set-group-closed";
+import { useConfirmAndExecuteTransaction } from "@lib/safe/use-confirm-and-execute-transaction";
+import { useConfirmTransaction } from "@lib/safe/use-confirm-transaciont";
+import { useExecuteTransaction } from "@lib/safe/use-execute-transaction";
+import { useGetSafeTransaction } from "@lib/safe/use-get-safe-transacion";
 import { GroupWithInfo } from "app/db/types";
 
 interface GroupPageInnerProps {
@@ -28,11 +33,79 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   const router = useRouter();
   const [newExpenseModalOpen, setNewExpenseModalOpen] = useState(false);
 
-  const { mutate: closeGroup, isLoading } = useCloseGroup();
+  const { data: transaction, refetch } = useGetSafeTransaction({
+    txnHash: group.close_txn_hash || "",
+  });
+
+  const hasConfirmed = transaction?.confirmations?.find(
+    (confirmation) =>
+      confirmation.owner.toLowerCase() === address?.toLowerCase(),
+  );
+
+  const { mutate: setGroupClosed } = useSetGroupClosed({
+    onSuccess() {
+      onSuccess?.();
+    },
+  });
+
+  const { mutate: closeGroup, isLoading } = useCloseGroup({
+    onSuccess() {
+      refetch();
+    },
+  });
+
+  const { mutate: confirmTransaction, isLoading: isLoadingConfirm } =
+    useConfirmTransaction({
+      onSuccess() {
+        refetch();
+      },
+    });
+
+  const { mutate: execute, isLoading: isLoadingExecute } =
+    useExecuteTransaction({
+      onSuccess() {
+        refetch();
+        setGroupClosed({ groupId: group.id });
+      },
+    });
+  const { mutate: confirmAndExecute, isLoading: isLoadingConfirmAndExecute } =
+    useConfirmAndExecuteTransaction({
+      onSuccess() {
+        refetch();
+        setGroupClosed({ groupId: group.id });
+      },
+    });
+
+  const onApproveTransaction = () => {
+    if (!transaction?.confirmationsRequired || !group.close_txn_hash) return;
+
+    const confirmationsLeft =
+      transaction?.confirmationsRequired -
+      (transaction?.confirmations?.length || 0);
+
+    if (confirmationsLeft === 0) {
+      execute({
+        groupOwner: group.owner,
+        txnHash: group.close_txn_hash,
+      });
+    } else if (confirmationsLeft === 1) {
+      confirmAndExecute({
+        groupOwner: group.owner,
+        txnHash: group.close_txn_hash,
+      });
+    } else {
+      confirmTransaction({
+        groupOwner: group.owner,
+        txnHash: group.close_txn_hash,
+      });
+    }
+  };
 
   const onCloseGroup = () => {
     closeGroup({
       groupId: group.id,
+      group_contract: group.address,
+      group_owner: group.owner,
     });
   };
 
@@ -64,7 +137,12 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
     <div>
       <div className="flex justify-between">
         <div>
-          <h1 className="mb-4 text-3xl font-bold">{group.name}</h1>
+          <div className="mb-4 flex items-center gap-2">
+            <h1 className="text-3xl font-bold">{group.name}</h1>
+            {group.closed && (
+              <span className="rounded-box bg-info px-3 py-0.5">Closed</span>
+            )}
+          </div>
           <span>Members: </span>
           {groupMembers.map((member, index) => (
             <Fragment key={member.user_address}>
@@ -111,6 +189,45 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
             Close debts
           </Button>
         )}
+        <div>
+          {!group.closed && currentUserStatus === "active" && (
+            <div>
+              {group.close_txn_hash ? (
+                <div className="flex items-center gap-2">
+                  <div>
+                    {transaction?.confirmations?.length} /{" "}
+                    {transaction?.confirmationsRequired} Confirmations{" "}
+                  </div>
+                  {!hasConfirmed && (
+                    <Button
+                      onClick={onApproveTransaction}
+                      loading={
+                        isLoadingConfirm ||
+                        isLoadingExecute ||
+                        isLoadingConfirmAndExecute
+                      }
+                      disabled={
+                        isLoadingConfirm ||
+                        isLoadingExecute ||
+                        isLoadingConfirmAndExecute
+                      }
+                    >
+                      Approve Close Group
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <Button
+                  onClick={onCloseGroup}
+                  loading={isLoading}
+                  disabled={isLoading}
+                >
+                  Close group
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       <DebtsList
         group={group}
@@ -134,7 +251,11 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
           onCreate={onSuccess}
         />
       </div>
-      <ExpensesList group={group} currentUserStatus={currentUserStatus} />
+      <ExpensesList
+        group={group}
+        onSuccess={onSuccess}
+        currentUserStatus={currentUserStatus || ""}
+      />
     </div>
   );
 };

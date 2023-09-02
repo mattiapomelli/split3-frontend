@@ -20,6 +20,8 @@ interface ExpenseRowProps {
   expense: GroupExpense;
   group: GroupWithMembers;
   shouldShowApproveButton: boolean;
+  onSuccess?: () => void;
+
   className?: string;
 }
 
@@ -28,15 +30,16 @@ export const ExpenseRow = ({
   group,
   className,
   shouldShowApproveButton,
+  onSuccess,
 }: ExpenseRowProps) => {
   const { address } = useAccount();
   const { data: transaction, refetch } = useGetSafeTransaction({
     txnHash: expense.tx_hash || "",
   });
 
-  const { mutate } = useSyncGroupDebts({
+  const { mutate: syncDebts } = useSyncGroupDebts({
     onSuccess: () => {
-      console.log("Synced");
+      onSuccess?.();
     },
   });
 
@@ -49,7 +52,7 @@ export const ExpenseRow = ({
   const { mutate: execute, isLoading: isLoadingExecute } =
     useExecuteTransaction({
       onSuccess() {
-        mutate({
+        syncDebts({
           group,
           expense,
         });
@@ -59,7 +62,7 @@ export const ExpenseRow = ({
   const { mutate: confirmAndExecute, isLoading: isLoadingConfirmAndExecute } =
     useConfirmAndExecuteTransaction({
       onSuccess() {
-        mutate({
+        syncDebts({
           group,
           expense,
         });
