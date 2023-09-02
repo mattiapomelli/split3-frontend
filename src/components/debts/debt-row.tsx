@@ -13,6 +13,7 @@ import { Debt, Group } from "app/db/types";
 interface ExpenseRowProps {
   debt: Debt;
   group: Group;
+  shouldShowRequestButton: boolean;
   className?: string;
   onSuccess?: () => void;
 }
@@ -22,6 +23,7 @@ export const DebtRow = ({
   group,
   className,
   onSuccess,
+  shouldShowRequestButton,
 }: ExpenseRowProps) => {
   const { address } = useAccount();
 
@@ -84,7 +86,7 @@ export const DebtRow = ({
       )}
 
       {/* TODO: show this only if the group is closed */}
-      {userIsOwed ? (
+      {shouldShowRequestButton && userIsOwed ? (
         <div>
           {debt.settled ? (
             <p>You got repaid</p>
@@ -111,13 +113,15 @@ export const DebtRow = ({
           ) : (
             <div>
               {debt.request_id && <p>You have been requested a payment </p>}
-              <Button
-                onClick={onPayDebt}
-                loading={isPayLoading || isSettleLoading}
-                disabled={isPayLoading || isSettleLoading}
-              >
-                Settle debt
-              </Button>
+              {shouldShowRequestButton && (
+                <Button
+                  onClick={onPayDebt}
+                  loading={isPayLoading || isSettleLoading}
+                  disabled={isPayLoading || isSettleLoading}
+                >
+                  Settle debt
+                </Button>
+              )}
             </div>
           )}
         </div>

@@ -9,9 +9,13 @@ import { ExpenseRow } from "./expense-row";
 
 interface ExpensesListProps {
   group: GroupWithInfo;
+  currentUserStatus?: string;
 }
 
-export const ExpensesList = ({ group }: ExpensesListProps) => {
+export const ExpensesList = ({
+  group,
+  currentUserStatus,
+}: ExpensesListProps) => {
   // const [modalOpen, setModalOpen] = useState(false);
 
   if (!group.expenses.length)
@@ -28,6 +32,7 @@ export const ExpensesList = ({ group }: ExpensesListProps) => {
           key={expense.id}
           expense={expense}
           group={group}
+          shouldShowApproveButton={currentUserStatus === "active"}
           className={cx(
             { "-mt-px": index !== 0 },
             { "rounded-t-box": index === 0 },

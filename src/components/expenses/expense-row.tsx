@@ -19,10 +19,16 @@ import { GroupExpense, GroupWithMembers } from "app/db/types";
 interface ExpenseRowProps {
   expense: GroupExpense;
   group: GroupWithMembers;
+  shouldShowApproveButton: boolean;
   className?: string;
 }
 
-export const ExpenseRow = ({ expense, group, className }: ExpenseRowProps) => {
+export const ExpenseRow = ({
+  expense,
+  group,
+  className,
+  shouldShowApproveButton,
+}: ExpenseRowProps) => {
   const { address } = useAccount();
   const { data: transaction, refetch } = useGetSafeTransaction({
     txnHash: expense.tx_hash || "",
@@ -128,7 +134,8 @@ export const ExpenseRow = ({ expense, group, className }: ExpenseRowProps) => {
             {transaction?.confirmations?.length} /{" "}
             {transaction?.confirmationsRequired} Confirmations{" "}
             {!transaction?.isExecuted &&
-              expense.user_address !== address?.toLowerCase() && (
+              expense.user_address !== address?.toLowerCase() &&
+              shouldShowApproveButton && (
                 <Button
                   onClick={onApproveTransaction}
                   loading={

@@ -9,10 +9,15 @@ import { DebtRow } from "./debt-row";
 
 interface ExpensesListProps {
   group: GroupWithInfo;
+  currentUserStatus: string;
   onSuccess?: () => void;
 }
 
-export const DebtsList = ({ group, onSuccess }: ExpensesListProps) => {
+export const DebtsList = ({
+  group,
+  onSuccess,
+  currentUserStatus,
+}: ExpensesListProps) => {
   const { address } = useAccount();
 
   const userDebts = group.debts.filter(
@@ -36,6 +41,7 @@ export const DebtsList = ({ group, onSuccess }: ExpensesListProps) => {
           debt={debt}
           group={group}
           onSuccess={onSuccess}
+          shouldShowRequestButton={currentUserStatus === "active"}
           className={cx(
             { "-mt-px": index !== 0 },
             { "rounded-t-box": index === 0 },

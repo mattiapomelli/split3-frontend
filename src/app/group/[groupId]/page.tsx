@@ -2,7 +2,9 @@
 
 import { ArrowLeftIcon, PlusIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
+import { useAccount } from "wagmi";
 
 import { Address } from "@components/address";
 import { Button } from "@components/basic/button";
@@ -13,6 +15,7 @@ import { NewExpenseModal } from "@components/expenses/new-expense-modal";
 import { Spinner } from "@components/spinner";
 import { useCloseGroup } from "@lib/group/use-close-group";
 import { useGroup } from "@lib/group/use-group";
+import { useJoinGroup } from "@lib/group/use-join-group";
 import { GroupWithInfo } from "app/db/types";
 
 interface GroupPageInnerProps {
@@ -21,6 +24,8 @@ interface GroupPageInnerProps {
 }
 
 const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
+  const { address } = useAccount();
+  const router = useRouter();
   const [newExpenseModalOpen, setNewExpenseModalOpen] = useState(false);
 
   const { mutate: closeGroup, isLoading } = useCloseGroup();
@@ -38,6 +43,22 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   const invitedMembers = group.members.filter(
     (member) => member.status === "inactive",
   );
+
+  const currentUserStatus = group.members.find(
+    (u) => u.user_address.toLowerCase() === address?.toLowerCase(),
+  )?.status;
+
+  const { mutate: joinGroup, isLoading: isLoadingJoin } = useJoinGroup({
+    onSuccess() {
+      router.push(`/group/${group.id}`);
+    },
+  });
+
+  const onJoinGroup = async () => {
+    joinGroup({
+      groupId: group.id,
+    });
+  };
 
   return (
     <div>
@@ -64,14 +85,24 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
             </Fragment>
           ))}
         </div>
-        <CopyButton text={`http://localhost:3000/join/${group.id}`}>
-          Copy Invite Link
-        </CopyButton>
+        {currentUserStatus === "active" ? (
+          <CopyButton text={`http://localhost:3000/join/${group.id}`}>
+            Copy Invite Link
+          </CopyButton>
+        ) : (
+          <Button
+            onClick={onJoinGroup}
+            loading={isLoadingJoin}
+            disabled={isLoading}
+          >
+            Join
+          </Button>
+        )}
       </div>
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <h2 className="mb-4 text-2xl font-bold">Debts</h2>
 
-        {!group.closed && (
+        {!group.closed && currentUserStatus === "active" && (
           <Button
             onClick={onCloseGroup}
             loading={isLoading}
@@ -81,15 +112,21 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
           </Button>
         )}
       </div>
-      <DebtsList group={group} onSuccess={onSuccess} />
+      <DebtsList
+        group={group}
+        onSuccess={onSuccess}
+        currentUserStatus={currentUserStatus || "inactive"}
+      />
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <h2 className="mb-4 text-2xl font-bold">Expenses</h2>
-        <Button
-          rightIcon={<PlusIcon className="h-5 w-5" />}
-          onClick={() => setNewExpenseModalOpen(true)}
-        >
-          New Expense
-        </Button>
+        {currentUserStatus === "active" && (
+          <Button
+            rightIcon={<PlusIcon className="h-5 w-5" />}
+            onClick={() => setNewExpenseModalOpen(true)}
+          >
+            New Expense
+          </Button>
+        )}
         <NewExpenseModal
           open={newExpenseModalOpen}
           onClose={() => setNewExpenseModalOpen(false)}
@@ -97,7 +134,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
           onCreate={onSuccess}
         />
       </div>
-      <ExpensesList group={group} />
+      <ExpensesList group={group} currentUserStatus={currentUserStatus} />
     </div>
   );
 };
