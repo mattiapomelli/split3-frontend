@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabaseClient } from "../../app/db";
+
 import { getGroupExpenses } from "../../app/db/group_expenses";
 interface UseGroupExpensesOptions {
   groupId: number;
