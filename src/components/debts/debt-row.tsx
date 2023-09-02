@@ -76,55 +76,58 @@ export const DebtRow = ({
       {userIsOwed ? (
         <p>
           <Address address={debt.debtor_address as `0x${string}`} /> owes you{" "}
-          <span className="font-medium">{debt.amount} USDC</span>
+          <span className="font-medium">{debt.amount} FAU</span>
         </p>
       ) : (
         <p>
           You owe <Address address={debt.creditor_address as `0x${string}`} />{" "}
-          <span className="font-medium">{debt.amount} USDC</span>
+          <span className="font-medium">{debt.amount} FAU</span>
         </p>
       )}
 
-      {/* TODO: show this only if the group is closed */}
-      {shouldShowRequestButton && userIsOwed ? (
-        <div>
-          {debt.settled ? (
-            <p>You got repaid</p>
-          ) : (
+      {group.closed && (
+        <>
+          {shouldShowRequestButton && userIsOwed ? (
             <div>
-              {debt.request_id ? (
-                <p>You requested the payment </p>
+              {debt.settled ? (
+                <p>You got repaid</p>
               ) : (
-                <Button
-                  onClick={() => onRequestDebtPayment()}
-                  loading={isRequestLoading}
-                  disabled={isRequestLoading}
-                >
-                  Request payment
-                </Button>
+                <div>
+                  {debt.request_id ? (
+                    <p>You requested the payment </p>
+                  ) : (
+                    <Button
+                      onClick={() => onRequestDebtPayment()}
+                      loading={isRequestLoading}
+                      disabled={isRequestLoading}
+                    >
+                      Request payment
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
-          )}
-        </div>
-      ) : (
-        <div>
-          {debt.settled ? (
-            <p>You paid the debt</p>
           ) : (
             <div>
-              {debt.request_id && <p>You have been requested a payment </p>}
-              {shouldShowRequestButton && (
-                <Button
-                  onClick={onPayDebt}
-                  loading={isPayLoading || isSettleLoading}
-                  disabled={isPayLoading || isSettleLoading}
-                >
-                  Settle debt
-                </Button>
+              {debt.settled ? (
+                <p>You paid the debt</p>
+              ) : (
+                <div>
+                  {debt.request_id && <p>You have been requested a payment </p>}
+                  {shouldShowRequestButton && (
+                    <Button
+                      onClick={onPayDebt}
+                      loading={isPayLoading || isSettleLoading}
+                      disabled={isPayLoading || isSettleLoading}
+                    >
+                      Settle debt
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );
