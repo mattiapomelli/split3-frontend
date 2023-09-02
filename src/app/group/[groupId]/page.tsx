@@ -16,10 +16,10 @@ import { GroupWithInfo } from "app/db/types";
 
 interface GroupPageInnerProps {
   group: GroupWithInfo;
-  onCreate?: () => void;
+  onSuccess?: () => void;
 }
 
-const GroupPageInner = ({ group, onCreate }: GroupPageInnerProps) => {
+const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   const [newExpenseModalOpen, setNewExpenseModalOpen] = useState(false);
 
   return (
@@ -49,7 +49,7 @@ const GroupPageInner = ({ group, onCreate }: GroupPageInnerProps) => {
           Close debts
         </Button>
       </div>
-      <DebtsList group={group} />
+      <DebtsList group={group} onSuccess={onSuccess} />
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <h2 className="mb-4 text-2xl font-bold">Expenses</h2>
         <Button
@@ -62,7 +62,7 @@ const GroupPageInner = ({ group, onCreate }: GroupPageInnerProps) => {
           open={newExpenseModalOpen}
           onClose={() => setNewExpenseModalOpen(false)}
           group={group}
-          onCreate={onCreate}
+          onCreate={onSuccess}
         />
       </div>
       <ExpensesList group={group} />
@@ -100,7 +100,7 @@ export default function GroupPage({ params }: ProjectPageProps) {
       {isLoading || !group ? (
         <Spinner />
       ) : (
-        <GroupPageInner group={group} onCreate={refetch} />
+        <GroupPageInner group={group} onSuccess={refetch} />
       )}
     </div>
   );

@@ -14,12 +14,14 @@ interface CreateRequestParams {
   payerAddress: string;
   receiverAddress: string;
   amount: string;
+  reason: string;
 }
 
 const getCreateRequestParameters = ({
   payerAddress,
   receiverAddress,
   amount,
+  reason,
 }: CreateRequestParams): Types.ICreateRequestParameters => {
   return {
     requestInfo: {
@@ -64,7 +66,7 @@ const getCreateRequestParameters = ({
     // The contentData can contain anything.
     // Consider using rnf_invoice format from @requestnetwork/data-format
     contentData: {
-      reason: "Debt Settlement Mumbai",
+      reason,
       // dueDate: "2023.06.16",
     },
 
@@ -87,13 +89,16 @@ export const useCreateRequest = (options?: UseCreateRequestOptions) => {
     async ({
       amount,
       receiverAddress,
-    }: Omit<CreateRequestParams, "payerAddress">) => {
+      payerAddress,
+      reason,
+    }: CreateRequestParams) => {
       if (!address) throw new Error("No address");
 
       const requestCreateParameters = getCreateRequestParameters({
-        payerAddress: address,
+        payerAddress,
         receiverAddress,
         amount,
+        reason,
       });
 
       const requestClient = getRequestClient();

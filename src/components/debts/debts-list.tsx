@@ -1,7 +1,7 @@
 "use client";
 
 import cx from "classnames";
-// import { useState } from "react";w
+import { useAccount } from "wagmi";
 
 import { GroupWithInfo } from "app/db/types";
 
@@ -9,12 +9,19 @@ import { DebtRow } from "./debt-row";
 
 interface ExpensesListProps {
   group: GroupWithInfo;
+  onSuccess?: () => void;
 }
 
-export const DebtsList = ({ group }: ExpensesListProps) => {
-  // const [modalOpen, setModalOpen] = useState(false);
+export const DebtsList = ({ group, onSuccess }: ExpensesListProps) => {
+  const { address } = useAccount();
 
-  if (!group.debts.length)
+  const userDebts = group.debts.filter(
+    (debt) =>
+      debt.debtor_address === address?.toLowerCase() ||
+      debt.creditor_address === address?.toLowerCase(),
+  );
+
+  if (!userDebts.length)
     return (
       <div className="rounded-box mt-6 border border-base-300 py-14 text-center">
         No debts yet
@@ -23,14 +30,16 @@ export const DebtsList = ({ group }: ExpensesListProps) => {
 
   return (
     <div className="flex flex-col">
-      {group.debts.map((debt, index) => (
+      {userDebts.map((debt, index) => (
         <DebtRow
           key={debt.id}
           debt={debt}
+          group={group}
+          onSuccess={onSuccess}
           className={cx(
             { "-mt-px": index !== 0 },
             { "rounded-t-box": index === 0 },
-            { "rounded-b-box": index === group.debts.length - 1 },
+            { "rounded-b-box": index === userDebts.length - 1 },
           )}
         />
       ))}
