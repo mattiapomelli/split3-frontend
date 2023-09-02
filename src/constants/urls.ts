@@ -1,9 +1,13 @@
-import { goerli, hardhat, polygon } from "wagmi/chains";
+import { celoAlfajores, goerli, hardhat, polygon } from "wagmi/chains";
+
+import { mantleTestnet } from "./chains";
 
 export const EXPLORER_URL: Record<number, string> = {
   [polygon.id]: "https://polygonscan.com",
   [goerli.id]: "https://goerli.etherscan.com",
   [hardhat.id]: "",
+  [celoAlfajores.id]: "https://explorer.celo.org/alfajores/address",
+  [mantleTestnet.id]: "https://explorer.testnet.mantle.xyz/address",
 };
 
 export const getAddressExplorerLink = (chainId: number, address: string) => {

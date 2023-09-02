@@ -1,5 +1,3 @@
-const { fontFamily } = require("tailwindcss/defaultTheme");
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -9,9 +7,6 @@ module.exports = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        main: ["Inter", ...fontFamily.sans],
-      },
       colors: {
         "base-content-neutral": "hsl(var(--bc) / 0.6)",
       },
@@ -27,6 +22,11 @@ module.exports = {
       {
         light: {
           ...require("daisyui/src/colors/themes")["[data-theme=light]"],
+          primary: "#2cb049",
+          "primary-content": "#ffffff",
+          success: "#11ad3e",
+          warning: "#f5ae0c",
+          error: "#e35656",
           "--btn-text-case": "none",
           "--rounded-btn": "0.75rem",
         },
@@ -34,6 +34,10 @@ module.exports = {
       {
         dark: {
           ...require("daisyui/src/colors/themes")["[data-theme=dark]"],
+          primary: "#1c9436",
+          "base-100": "#000000",
+          "base-300": "#333333",
+          neutral: "#eeeeee",
           "--btn-text-case": "none",
           "--rounded-btn": "0.75rem",
         },
