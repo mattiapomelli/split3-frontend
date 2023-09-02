@@ -54,6 +54,11 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
         .select("*")
         .single();
 
+      await supabaseClient.from("user_has_groups").insert({
+        user_address: address.toLowerCase(),
+        group_id: data!.id,
+      });
+
       if (error) throw error;
 
       return data.id;
