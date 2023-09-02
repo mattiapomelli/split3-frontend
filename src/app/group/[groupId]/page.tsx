@@ -41,6 +41,15 @@ const GroupPageInner = ({ group, onCreate }: GroupPageInnerProps) => {
         </CopyButton>
       </div>
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+        <h2 className="mb-4 text-2xl font-bold">Debts</h2>
+        <Button
+        // onClick={() => setNewExpenseModalOpen(true)}
+        >
+          Close debts
+        </Button>
+      </div>
+      <ExpensesList group={group} />
+      <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <h2 className="mb-4 text-2xl font-bold">Expenses</h2>
         <Button
           rightIcon={<PlusIcon className="h-5 w-5" />}
@@ -76,7 +85,7 @@ export default function GroupPage({ params }: ProjectPageProps) {
 
   return (
     <div>
-      <Link href="/" tabIndex={-1}>
+      <Link href="/groups" tabIndex={-1}>
         <Button
           leftIcon={<ArrowLeftIcon className="h-5 w-5" />}
           color="neutral"

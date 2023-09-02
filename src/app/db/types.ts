@@ -12,7 +12,7 @@ export interface Database {
       group_expenses: {
         Row: {
           amount: number | null;
-          creditor_user_addresses: string;
+          debtor_addresses: string;
           group_id: number | null;
           id: number;
           title: string | null;
@@ -20,7 +20,7 @@ export interface Database {
         };
         Insert: {
           amount?: number | null;
-          creditor_user_addresses: string;
+          debtor_addresses: string;
           group_id?: number | null;
           id?: number;
           title?: string | null;
@@ -28,7 +28,7 @@ export interface Database {
         };
         Update: {
           amount?: number | null;
-          creditor_user_addresses?: string;
+          debtor_addresses?: string;
           group_id?: number | null;
           id?: number;
           title?: string | null;

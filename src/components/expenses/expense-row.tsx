@@ -18,7 +18,7 @@ interface ExpenseRowProps {
 export const ExpenseRow = ({ expense, className }: ExpenseRowProps) => {
   // const [modalOpen, setModalOpen] = useState(false);
 
-  const creditorUserAddresses = expense.creditor_user_addresses.split(",");
+  const debtorAddresses = expense.debtor_addresses.split(",");
 
   return (
     <div
@@ -42,12 +42,12 @@ export const ExpenseRow = ({ expense, className }: ExpenseRowProps) => {
 
       <div>
         for{" "}
-        {creditorUserAddresses.map((user, index) => (
+        {debtorAddresses.map((user, index) => (
           <Fragment key={user}>
             <span>
               <Address address={user as `0x${string}`} />
             </span>
-            {index < creditorUserAddresses.length - 1 ? ", " : ""}
+            {index < debtorAddresses.length - 1 ? ", " : ""}
           </Fragment>
         ))}
       </div>

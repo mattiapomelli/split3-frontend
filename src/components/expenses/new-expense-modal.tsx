@@ -41,21 +41,21 @@ export const NewExpenseModal = ({
     resolver: zodResolver(newExpenseSchema),
   });
 
-  const [creditors, setCreditors] = useState<string[]>([]);
+  const [debtors, setDebtors] = useState<string[]>([]);
 
-  const onAddCreditor = (address: string) => {
-    setCreditors((prev) => [...prev, address]);
+  const onAddDebtor = (address: string) => {
+    setDebtors((prev) => [...prev, address]);
   };
 
-  const onRemoveCreditor = (address: string) => {
-    setCreditors((prev) => prev.filter((a) => a !== address));
+  const onRemoveDebtor = (address: string) => {
+    setDebtors((prev) => prev.filter((a) => a !== address));
   };
 
-  const onToggleCreditor = (address: string) => {
-    if (creditors.includes(address)) {
-      onRemoveCreditor(address);
+  const onToggleDebtor = (address: string) => {
+    if (debtors.includes(address)) {
+      onRemoveDebtor(address);
     } else {
-      onAddCreditor(address);
+      onAddDebtor(address);
     }
   };
 
@@ -72,7 +72,7 @@ export const NewExpenseModal = ({
     createExpense({
       ...rest,
       amount: ethers.utils.parseEther(amount),
-      creditor_user_addresses: creditors.join(","),
+      debtor_addresses: debtors.join(","),
       group_id: group.id,
     });
   });
@@ -102,10 +102,10 @@ export const NewExpenseModal = ({
               <button
                 key={member.user_address}
                 type="button"
-                onClick={() => onToggleCreditor(member.user_address)}
+                onClick={() => onToggleDebtor(member.user_address)}
                 className={cx(
                   "rounded-box w-full p-4 py-2",
-                  creditors.includes(member.user_address)
+                  debtors.includes(member.user_address)
                     ? "bg-primary/60"
                     : "bg-base-200 hover:bg-base-300",
                 )}
