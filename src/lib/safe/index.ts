@@ -31,7 +31,10 @@ export const deploySafe = async (
     threshold: addresses.length / 2 + 1,
   };
 
-  return await safeFactory.deploySafe({ safeAccountConfig });
+  return await safeFactory.deploySafe({
+    safeAccountConfig,
+    saltNonce: Date.now().toString(),
+  });
 };
 
 export const createTransaction = async (

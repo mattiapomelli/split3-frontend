@@ -55,10 +55,14 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
         name,
       });
 
-      await addUserToGroup({
-        user_address: address.toLowerCase(),
-        group_id: groupId,
-      });
+      try {
+        await addUserToGroup({
+          user_address: address.toLowerCase(),
+          group_id: groupId,
+        });
+      } catch (e) {
+        console.error(e);
+      }
 
       return groupId;
     },
