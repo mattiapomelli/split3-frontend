@@ -39,3 +39,13 @@ export const updateUserGroupStatus = async (
     throw error;
   }
 };
+
+export const getGroupMembers = async (groupId: number): Promise<string[]> => {
+  const { data, error } = await supabaseClient
+    .from("user_has_group")
+    .select("user_address")
+    .eq("group_id", groupId)
+    .eq("status", "active");
+  if (error) throw error;
+  return data?.map((d) => d.user_address) ?? [];
+};

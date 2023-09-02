@@ -6,6 +6,7 @@ import { Fragment } from "react";
 
 import { Address } from "@components/address";
 import { Button } from "@components/basic/button";
+import { useSyncGroupDebts } from "@lib/debt/use-sync-debts";
 import { useConfirmAndExecuteTransaction } from "@lib/safe/use-confirm-and-execute-transaction";
 import { useConfirmTransaction } from "@lib/safe/use-confirm-transaciont";
 import { useGetSafeTransaction } from "@lib/safe/use-get-safe-transacion";
@@ -24,6 +25,12 @@ export const ExpenseRow = ({ expense, group, className }: ExpenseRowProps) => {
     txnHash: expense.tx_hash || "",
   });
 
+  const { mutate } = useSyncGroupDebts({
+    onSuccess: () => {
+      console.log("Synced");
+    },
+  });
+
   const { mutate: executeTransaction, isLoading: isLoadingConfirm } =
     useConfirmTransaction({
       onSuccess() {
@@ -33,6 +40,10 @@ export const ExpenseRow = ({ expense, group, className }: ExpenseRowProps) => {
   const { mutate: confirmAndExecute, isLoading: isLoadingExecute } =
     useConfirmAndExecuteTransaction({
       onSuccess() {
+        mutate({
+          groupId: group.id,
+          groupAddress: group.owner,
+        });
         refetch();
       },
     });
