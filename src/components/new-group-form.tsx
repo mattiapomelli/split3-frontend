@@ -11,6 +11,8 @@ import { Button } from "@components/basic/button";
 import { Input } from "@components/basic/input";
 import { useCreateGroup } from "@lib/group/use-create-group";
 
+import { Label } from "./basic/label";
+
 const newGroupSchema = z.object({
   name: z.string().min(1),
   stakeAmount: z.string().min(1),
@@ -55,10 +57,13 @@ export const NewGroupForm = () => {
     const otherMembers = members
       .map((member) => member.address)
       .filter(Boolean);
+
+    const amount = ethers.utils.parseEther(stakeAmount);
+
     createGroup({
       name,
       initialMembers: otherMembers,
-      stakeAmount: ethers.utils.parseEther(stakeAmount),
+      stakeAmount: amount,
     });
   });
 
@@ -77,18 +82,22 @@ export const NewGroupForm = () => {
         {...register("stakeAmount")}
         error={errors.stakeAmount?.message}
       />
-      {fields.map((field, index) => (
-        <div key={field.id} className="flex flex-col gap-2">
-          <Input
-            label={`Member ${index + 1} Address`}
-            block
-            {...register(`members.${index}.address`, {
-              required: "Title is required",
-            })}
-            error={errors.members?.[index]?.address?.message}
-          />
+      <div>
+        <Label>Members</Label>
+        <div className="flex flex-col gap-2">
+          {fields.map((field, index) => (
+            <Input
+              key={field.id}
+              // label={`Member ${index + 1} Address`}
+              block
+              {...register(`members.${index}.address`, {
+                required: "Title is required",
+              })}
+              error={errors.members?.[index]?.address?.message}
+            />
+          ))}
         </div>
-      ))}
+      </div>
       <Button
         type="button"
         color="neutral"

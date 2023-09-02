@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { NewGroupForm } from "@components/new-group-form";
 
 export const metadata = {
@@ -11,12 +9,6 @@ export default function NewGroupPage() {
     <div className="mx-auto mt-10 w-full max-w-sm">
       <h1 className="mb-4 text-center text-3xl font-bold">New Group</h1>
       <NewGroupForm />
-      <p className="mt-4 text-center text-sm">
-        Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-primary hover:underline">
-          Sign up
-        </Link>
-      </p>
     </div>
   );
 }

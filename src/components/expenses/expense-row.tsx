@@ -6,7 +6,8 @@ import { Fragment } from "react";
 
 import { Address } from "@components/address";
 import { Button } from "@components/basic/button";
-import { useExecuteTransaction } from "@lib/safe/use-execute-transaction";
+import { useConfirmAndExecuteTransaction } from "@lib/safe/use-confirm-and-execute-transaction";
+import { useConfirmTransaction } from "@lib/safe/use-confirm-transaciont";
 import { useGetSafeTransaction } from "@lib/safe/use-get-safe-transacion";
 import { Group, GroupExpense } from "app/db/types";
 
@@ -19,25 +20,43 @@ interface ExpenseRowProps {
 }
 
 export const ExpenseRow = ({ expense, group, className }: ExpenseRowProps) => {
-  const { data: transaction } = useGetSafeTransaction({
+  const { data: transaction, refetch } = useGetSafeTransaction({
     txnHash: expense.tx_hash || "",
   });
 
-  console.log("Transaction");
-
-  const { mutate: executeTransaction, isLoading } = useExecuteTransaction();
-
-  const onExecuteTransaction = () => {
-    executeTransaction({
-      groupOwner: group.owner,
-      txnHash: expense.tx_hash || "",
+  const { mutate: executeTransaction, isLoading: isLoadingConfirm } =
+    useConfirmTransaction({
+      onSuccess() {
+        refetch();
+      },
     });
+  const { mutate: confirmAndExecute, isLoading: isLoadingExecute } =
+    useConfirmAndExecuteTransaction({
+      onSuccess() {
+        refetch();
+      },
+    });
+
+  const onApproveTransaction = () => {
+    const isOneConfirmationLeft =
+      transaction?.confirmationsRequired &&
+      transaction?.confirmations?.length ===
+        transaction?.confirmationsRequired - 1;
+
+    if (isOneConfirmationLeft) {
+      confirmAndExecute({
+        groupOwner: group.owner,
+        txnHash: expense.tx_hash || "",
+      });
+    } else {
+      executeTransaction({
+        groupOwner: group.owner,
+        txnHash: expense.tx_hash || "",
+      });
+    }
   };
 
   const debtorAddresses = expense.debtor_addresses.split(",");
-
-  const isThresholdReached =
-    transaction?.confirmations?.length === transaction?.confirmationsRequired;
 
   return (
     <div
@@ -78,11 +97,11 @@ export const ExpenseRow = ({ expense, group, className }: ExpenseRowProps) => {
           <div>
             {transaction?.confirmations?.length} /{" "}
             {transaction?.confirmationsRequired} Confirmations{" "}
-            {isThresholdReached && (
+            {!transaction?.isExecuted && (
               <Button
-                onClick={onExecuteTransaction}
-                loading={isLoading}
-                disabled={isLoading}
+                onClick={onApproveTransaction}
+                loading={isLoadingConfirm || isLoadingExecute}
+                disabled={isLoadingConfirm || isLoadingExecute}
               >
                 Approve
               </Button>
@@ -90,17 +109,6 @@ export const ExpenseRow = ({ expense, group, className }: ExpenseRowProps) => {
           </div>
         )}
       </div>
-
-      {/* <div className="hidden items-center md:flex md:basis-[120px] lg:basis-[200px]">
-        <TriggerTypeBadge type={post.trigger_type} />
-      </div> */}
-
-      {/* <PostModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          post={post}
-          project={project}
-        /> */}
     </div>
   );
 };

@@ -4,9 +4,9 @@ import { useAccount, useNetwork, useSigner } from "wagmi";
 
 import { GroupAbi, GroupBytecode } from "@abis/group";
 import { deploySafe } from "@lib/safe";
+import { supabaseClient } from "app/db";
 
 import { createGroup } from "../../app/db/groups";
-import { addUserToGroup } from "../../app/db/user_has_groups";
 
 interface CreateGroupParams {
   stakeAmount: BigNumber;
@@ -45,27 +45,37 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
       );
       await groupContract.deployed();
 
+      const amount = Number(stakeAmount.toString());
+
+      const { error } = await supabaseClient.from("users").upsert(
+        initialMembers.map((address) => {
+          return {
+            address: address.toLowerCase(),
+          };
+        }),
+      );
+
+      if (error) throw error;
+
       const groupId = await createGroup({
         address: groupContract.address,
         chain: chain?.name,
         owner: safeAddress,
-        required_amount: Number(stakeAmount.toString()),
+        required_amount: amount,
         name,
       });
 
-      await Promise.all([
-        ...initialMembers.map((address) =>
-          addUserToGroup({
-            user_address: address.toLowerCase(),
-            group_id: groupId,
-            status: "inactive",
-          }),
-        ),
-        addUserToGroup({
+      await supabaseClient.from("user_has_group").insert([
+        ...initialMembers.map((address) => ({
+          user_address: address.toLowerCase(),
+          group_id: groupId,
+          status: "inactive",
+        })),
+        {
           user_address: address.toLowerCase(),
           group_id: groupId,
           status: "active",
-        }),
+        },
       ]);
 
       return groupId;

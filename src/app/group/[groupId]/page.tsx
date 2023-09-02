@@ -23,7 +23,7 @@ interface GroupPageInnerProps {
 const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   const [newExpenseModalOpen, setNewExpenseModalOpen] = useState(false);
 
-  const { mutate: closeGroup } = useCloseGroup();
+  const { mutate: closeGroup, isLoading } = useCloseGroup();
 
   const onCloseGroup = () => {
     closeGroup({
@@ -52,7 +52,16 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
       </div>
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <h2 className="mb-4 text-2xl font-bold">Debts</h2>
-        <Button onClick={onCloseGroup}>Close debts</Button>
+
+        {!group.closed && (
+          <Button
+            onClick={onCloseGroup}
+            loading={isLoading}
+            disabled={isLoading}
+          >
+            Close debts
+          </Button>
+        )}
       </div>
       <DebtsList group={group} onSuccess={onSuccess} />
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
