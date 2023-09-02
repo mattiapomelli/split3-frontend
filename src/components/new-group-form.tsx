@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ethers } from "ethers";
+import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
 import { z } from "zod";
@@ -20,6 +21,7 @@ type NewGroupData = z.infer<typeof newGroupSchema>;
 
 export const NewGroupForm = () => {
   const { address } = useAccount();
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -41,7 +43,11 @@ export const NewGroupForm = () => {
     name: "members",
   });
 
-  const { mutate: createGroup, isLoading } = useCreateGroup();
+  const { mutate: createGroup, isLoading } = useCreateGroup({
+    onSuccess(groupId) {
+      router.push(`/group/${groupId}`);
+    },
+  });
 
   const onSubmit = handleSubmit(async ({ name, members, stakeAmount }) => {
     if (!address) return;

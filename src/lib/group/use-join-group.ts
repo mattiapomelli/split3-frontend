@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { useAccount, useSigner } from "wagmi";
+import { useAccount, useEnsName, useSigner } from "wagmi";
 
 import { supabaseClient } from "app/db";
 
@@ -11,6 +11,7 @@ interface UseCreateRequestOptions {
 
 export const useJoinGroup = (options?: UseCreateRequestOptions) => {
   const { address } = useAccount();
+  const { data: ensName } = useEnsName({ address });
 
   const { data: signer } = useSigner();
 
@@ -24,6 +25,11 @@ export const useJoinGroup = (options?: UseCreateRequestOptions) => {
         .eq("id", groupId)
         .single();
       if (error) throw error;
+
+      await supabaseClient.from("users").upsert({
+        address: address.toLowerCase(),
+        ens_label: ensName,
+      });
 
       const groupContract = getGroupContract(group.address, signer);
 
