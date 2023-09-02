@@ -3,13 +3,13 @@ import { useAccount, useProvider, useSigner } from "wagmi";
 
 import { getPendingTransactions } from "@lib/safe/index";
 
-interface UseGroupPendingTransactionsOptions {
+interface UseGetSafePendingTransactionsOptions {
   group_owner: string;
 }
 
-export const useGetPendingTransactions = ({
+export const useGetSafePendingTransactions = ({
   group_owner,
-}: UseGroupPendingTransactionsOptions) => {
+}: UseGetSafePendingTransactionsOptions) => {
   const { address } = useAccount();
   const provider = useProvider();
   const { data: signer } = useSigner();
