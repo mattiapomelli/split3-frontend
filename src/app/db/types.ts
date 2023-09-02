@@ -77,17 +77,17 @@ export interface Database {
         Row: {
           created_at: string
           group_id: number
-          user_id: string
+          user_address: string
         }
         Insert: {
           created_at?: string
           group_id: number
-          user_id: string
+          user_address: string
         }
         Update: {
           created_at?: string
           group_id?: number
-          user_id?: string
+          user_address?: string
         }
         Relationships: [
           {
@@ -97,8 +97,8 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "user_has_group_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "user_has_group_user_address_fkey"
+            columns: ["user_address"]
             referencedRelation: "users"
             referencedColumns: ["address"]
           }
