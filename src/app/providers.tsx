@@ -2,16 +2,14 @@
 
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
 import { ThemeProvider } from "next-themes";
+import { ReactNode } from "react";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
 import { CHAIN } from "@constants/chains";
 import { env } from "env.mjs";
-
-import { ReactNode } from "react";
 
 const { chains, provider } = configureChains(
   [CHAIN],
