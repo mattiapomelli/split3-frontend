@@ -12,6 +12,8 @@ import { DebtsList } from "@components/debts/debts-list";
 import { ExpensesList } from "@components/expenses/expenses-list";
 import { NewExpenseModal } from "@components/expenses/new-expense-modal";
 import { Spinner } from "@components/spinner";
+import { NewTransferModal } from "@components/transfers/new-transfer-modal";
+import { TransfersList } from "@components/transfers/transfers-list";
 import { useCloseGroup } from "@lib/group/use-close-group";
 import { useDepositToGroup } from "@lib/group/use-deposit-to-group";
 import { useGroupBalance } from "@lib/group/use-get-group-balance";
@@ -28,10 +30,10 @@ interface GroupPageInnerProps {
   group: GroupWithInfo;
   onSuccess?: () => void;
 }
-
 const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   const { address } = useAccount();
   const [newExpenseModalOpen, setNewExpenseModalOpen] = useState(false);
+  const [newTransferModalOpen, setNewTransferModalOpen] = useState(false);
 
   const { data: transaction, refetch } = useGetSafeTransaction({
     txnHash: group.close_txn_hash || "",
@@ -282,6 +284,28 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
         />
       </div>
       <ExpensesList
+        group={group}
+        onSuccess={onSuccess}
+        currentUserStatus={currentUserStatus || ""}
+      />
+      <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+        <h2 className="mb-4 text-2xl font-bold">Transfers</h2>
+        {currentUserStatus === "active" && (
+          <Button
+            rightIcon={<PlusIcon className="h-5 w-5" />}
+            onClick={() => setNewTransferModalOpen(true)}
+          >
+            New Transfer
+          </Button>
+        )}
+        <NewTransferModal
+          open={newTransferModalOpen}
+          onClose={() => setNewTransferModalOpen(false)}
+          group={group}
+          onCreate={onSuccess}
+        />
+      </div>
+      <TransfersList
         group={group}
         onSuccess={onSuccess}
         currentUserStatus={currentUserStatus || ""}

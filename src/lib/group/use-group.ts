@@ -13,7 +13,7 @@ export const useGroup = ({ groupId }: UseGroupOptions) => {
       const { data, error } = await supabaseClient
         .from("groups")
         .select(
-          "*, members:user_has_group(user_address, status), expenses:group_expenses(*), debts:debts(*)",
+          "*, members:user_has_group(user_address, status), expenses:group_expenses(*), debts:debts(*), transfers:group_transfers(*)",
         )
         .eq("id", groupId)
         .single();

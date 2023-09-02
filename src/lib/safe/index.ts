@@ -45,8 +45,8 @@ export const createTransaction = async (
   amount?: string,
 ) => {
   const safeTransactionData: SafeTransactionDataPartial = {
-    to,
     data,
+    to,
     value: amount ? ethers.utils.parseUnits(amount, "ether").toString() : "0",
   };
   return await safeSdkOwner.createTransaction({ safeTransactionData });

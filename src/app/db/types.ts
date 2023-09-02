@@ -106,7 +106,7 @@ export interface Database {
       };
       group_transfers: {
         Row: {
-          amount: number | null;
+          amount: number;
           created_at: string;
           group_id: number;
           id: number;
@@ -247,6 +247,7 @@ export type GroupWithMembers = Group & {
 export type GroupWithInfo = GroupWithMembers & {
   expenses: GroupExpense[];
   debts: Debt[];
+  transfers: GroupTransfer[];
 };
 
 export type CreateGroup = Database["public"]["Tables"]["groups"]["Insert"];

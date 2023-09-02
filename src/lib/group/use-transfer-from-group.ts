@@ -3,6 +3,7 @@ import { useAccount, useNetwork, useSigner } from "wagmi";
 
 import { createTransaction, proposeTransaction } from "@lib/safe";
 import { getSafe } from "@lib/safe/utils";
+import { parseAmount } from "@utils/amounts";
 
 import { createGroupTransfer } from "../../app/db/group_transfers";
 
@@ -36,24 +37,31 @@ export const useTransferFromGroup = (
     }: TransferFromGroupData) => {
       if (!address || !signer || !chain) throw new Error("No address");
       const safe = await getSafe(group_owner, signer);
-      const createExpenseTx = await createTransaction(
+      const createTransferTx = await createTransaction(
         safe,
         group_contract,
-        "",
+        "0x",
         amount,
       );
       const txHash = await proposeTransaction(
         signer,
         safe,
         group_owner,
-        createExpenseTx,
+        createTransferTx,
         address,
       );
+      console.log("Creating group transfer", {
+        group_id,
+        status: "pending",
+        tx_hash: txHash,
+        amount: parseAmount(amount).toNumber(),
+        recipient_address,
+      });
       await createGroupTransfer({
         group_id,
         status: "pending",
         tx_hash: txHash,
-        amount: parseFloat(amount),
+        amount: parseAmount(amount).toNumber(),
         recipient_address,
       });
       return txHash;
