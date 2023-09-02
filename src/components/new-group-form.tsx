@@ -136,6 +136,7 @@ export const NewGroupForm = () => {
               className="mt-4 w-full"
               type="button"
               color="neutral"
+              rightIcon={<PlusIcon className="h-5 w-5" />}
               onClick={() =>
                 append({
                   address: "",
