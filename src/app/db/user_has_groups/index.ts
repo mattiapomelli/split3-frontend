@@ -9,6 +9,7 @@ export const addUserToGroup = async (userHasGroup: CreateUserHasGroup) => {
     .single();
 
   if (error) {
+    console.error("Error adding user to group: ", { error, userHasGroup });
     throw error;
   }
   return data.id;
