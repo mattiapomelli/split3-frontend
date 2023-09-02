@@ -4,7 +4,9 @@ import { useAccount, useNetwork, useSigner } from "wagmi";
 
 import { GroupAbi, GroupBytecode } from "@abis/group";
 import { deploySafe } from "@lib/safe";
-import { supabaseClient } from "app/db";
+
+import { createGroup } from "../../app/db/groups";
+import { addUserToGroup } from "../../app/db/user_has_groups";
 
 interface CreateGroupParams {
   stakeAmount: BigNumber;
@@ -45,30 +47,20 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
 
       console.log("Group address: ", groupContract.address);
 
-      // const requiredAmount = await contract.requiredAmount();
-
-      const { data: group, error } = await supabaseClient
-        .from("groups")
-        .insert({
-          address: groupContract.address,
-          chain: chain.name,
-          owner: safeAddress,
-          required_amount: Number(stakeAmount.toString()),
-          name,
-        })
-        .select("*")
-        .single();
-
-      console.log("Group:", group);
-
-      if (error) throw error;
-
-      await supabaseClient.from("user_has_groups").insert({
-        user_address: address.toLowerCase(),
-        group_id: group.id,
+      const groupId = await createGroup({
+        address: groupContract.address,
+        chain: chain?.name,
+        owner: safeAddress,
+        required_amount: Number(stakeAmount.toString()),
+        name,
       });
 
-      return group.id;
+      await addUserToGroup({
+        user_address: address.toLowerCase(),
+        group_id: groupId,
+      });
+
+      return groupId;
     },
     {
       onSuccess: options?.onSuccess,

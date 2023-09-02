@@ -1,17 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
+import { useAccount } from "wagmi";
 
-import { supabaseClient } from "app/db";
+import { getUserGroups } from "../../app/db/groups";
 
 export const useGroups = () => {
+  const { address } = useAccount();
   return useQuery({
     queryKey: ["groups"],
     queryFn: async () => {
-      const { data, error } = await supabaseClient
-        .from("groups")
-        .select("*, members:user_has_group(address:user_address)");
-      if (error) throw error;
-
-      return data;
+      return await getUserGroups(address!);
     },
   });
 };

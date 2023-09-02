@@ -136,9 +136,15 @@ export interface Database {
 }
 
 export type User = Database["public"]["Tables"]["users"]["Row"];
+
 export type Group = Database["public"]["Tables"]["groups"]["Row"];
+export type CreateGroup = Database["public"]["Tables"]["groups"]["Insert"];
+
 export type UserHasGroup =
   Database["public"]["Tables"]["user_has_group"]["Row"];
+export type CreateUserHasGroup =
+  Database["public"]["Tables"]["user_has_group"]["Insert"];
+
 export type GroupExpense =
   Database["public"]["Tables"]["group_expenses"]["Row"];
 export type CreateGroupExpense =
