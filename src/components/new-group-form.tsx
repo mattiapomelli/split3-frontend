@@ -55,11 +55,9 @@ export const NewGroupForm = () => {
     const otherMembers = members
       .map((member) => member.address)
       .filter(Boolean);
-    const groupMembers = [address, ...otherMembers];
-
     createGroup({
       name,
-      initialMembers: groupMembers,
+      initialMembers: otherMembers,
       stakeAmount: ethers.utils.parseEther(stakeAmount),
     });
   });

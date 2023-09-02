@@ -109,14 +109,86 @@ describe("SplitWiseGroup contract", function () {
       // Get the last added expenses
       const lastExpense = await splitWiseGroup.getExpense(expensesLength - 1);
 
+      let debt1to2 = await splitWiseGroup.getDebt(
+        member1.address,
+        member2.address,
+      );
+      let debt1to3 = await splitWiseGroup.getDebt(
+        member1.address,
+        member3.address,
+      );
+      let debt2to1 = await splitWiseGroup.getDebt(
+        member2.address,
+        member1.address,
+      );
+      let debt2to3 = await splitWiseGroup.getDebt(
+        member2.address,
+        member3.address,
+      );
+      let debt3to1 = await splitWiseGroup.getDebt(
+        member3.address,
+        member1.address,
+      );
+      let debt3to2 = await splitWiseGroup.getDebt(
+        member3.address,
+        member2.address,
+      );
+
+      expect(debt1to2).to.equal(0);
+      expect(debt1to3).to.equal(0);
+      expect(debt2to1).to.equal(amount.div(2));
+      expect(debt2to3).to.equal(0);
+      expect(debt3to1).to.equal(amount.div(2));
+      expect(debt3to2).to.equal(0);
+
       // Assert that the expense data matches the input
       expect(lastExpense.payer).to.equal(member1.address);
       expect(lastExpense.name).to.equal(name);
       expect(lastExpense.amount).to.equal(amount);
-      expect(lastExpense.creditor_addresses).to.deep.equal([
+      expect(lastExpense.debtor_addresses).to.deep.equal([
         member2.address,
         member3.address,
       ]);
+
+      const amount2 = ethers.utils.parseEther("2.0");
+
+      // Call the addExpense function
+      await splitWiseGroup.addExpense(
+        member2.address,
+        name,
+        [member1.address, member3.address],
+        amount2,
+      );
+
+      debt1to2 = await splitWiseGroup.getDebt(member1.address, member2.address);
+      debt1to3 = await splitWiseGroup.getDebt(member1.address, member3.address);
+      debt2to1 = await splitWiseGroup.getDebt(member2.address, member1.address);
+      debt2to3 = await splitWiseGroup.getDebt(member2.address, member3.address);
+      debt3to1 = await splitWiseGroup.getDebt(member3.address, member1.address);
+      debt3to2 = await splitWiseGroup.getDebt(member3.address, member2.address);
+      console.log(
+        debt1to2.toString(),
+        debt1to3.toString(),
+        debt2to1.toString(),
+        debt2to3.toString(),
+        debt3to1.toString(),
+        debt3to2.toString(),
+      );
+      expect(
+        debt1to2,
+        "Debt from member1 to member2 should be 0.5 ETH",
+      ).to.equal(ethers.utils.parseEther("0.5"));
+      expect(debt1to3, "Debt from member1 to member2 should be 0").to.equal(0);
+      expect(debt2to1, "Debt from member2 to member1 should be 0").to.equal(0);
+      expect(debt2to3, "Debt from member2 to member3 should be 0").to.equal(0);
+      expect(
+        debt3to1,
+        "Debt from member3 to member1 should be 0.5 ETH",
+      ).to.equal(ethers.utils.parseEther("0.5"));
+      expect(
+        debt3to2,
+        "Debt from member3 to member2 should be 1.0 ETH",
+      ).to.equal(ethers.utils.parseEther("1.0"));
     });
 
     it("should not allow non-owners to add an expense", async function () {
@@ -201,7 +273,7 @@ describe("SplitWiseGroup contract", function () {
 
     it("Should not allow settling the group multiple times", async function () {
       await expect(splitWiseGroup.settleGroup()).to.be.revertedWith(
-        "The group is closed",
+        "The group is already settled",
       );
     });
   });

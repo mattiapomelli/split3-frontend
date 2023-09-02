@@ -25,12 +25,15 @@ contract SplitWiseGroup {
     // Boolean flag to indicate if the group has been settled
     bool public isSettled;
 
+    // Boolean flag to indicate if the group has been closed
+    bool public isClosed;
+
     // Struct to represent an expense
     struct Expense {
         address payer;                   // Address of the member who paid the expense
         string name;                     // Name of the expense
         uint256 amount;                  // Total expense amount
-        address[] creditor_addresses;
+        address[] debtor_addresses;
     }
 
     // Array to store expenses
@@ -38,9 +41,12 @@ contract SplitWiseGroup {
 
     uint256 public expensesLength;
 
-    // Event to log when an expense is added
-    event ExpenseAdded(uint256 expenseIndex, address payer, uint256 amount, string name, address[] creditor_addresses);
+    // debtor => creditor => amount
+    // Alice owes Bob 10 --> Alice => Bob => 10
+    mapping (address => mapping (address => uint256)) public debts;
 
+    // Event to log when an expense is added
+    event ExpenseAdded(uint256 expenseIndex, address payer, uint256 amount, string name, address[] debtor_addresses);
 
     // Constructor to initialize the contract with required amount and initial members
     constructor(uint256 _requiredAmount, address[] memory _members, address _owner) payable {
@@ -58,6 +64,9 @@ contract SplitWiseGroup {
 
         // Initialize the expensesLength to 0
         expensesLength = 0;
+
+        // Initialize the group as open
+        isClosed = false;
 
         // Initialize members with the provided addresses as Inactive
         for (uint256 i = 0; i < _members.length; i++) {
@@ -81,7 +90,13 @@ contract SplitWiseGroup {
 
     // Modifier to ensure the group is open (not settled)
     modifier isOpen() {
-        require(!isSettled, "The group is closed");
+        require(!isClosed, "The group is closed");
+        _;
+    }
+
+    // Modifier to ensure the group is open (not settled)
+    modifier isGroupSettled() {
+        require(!isSettled, "The group is settled");
         _;
     }
 
@@ -137,6 +152,7 @@ contract SplitWiseGroup {
 
     // Settle the group by distributing the balance among active members
     function settleGroup() external onlyOwner isOpen {
+        require(!isSettled, "The group is already settled");
         // Calculate the total balance of the contract
         uint256 totalBalance = address(this).balance;
 
@@ -201,35 +217,83 @@ contract SplitWiseGroup {
         payable(recipient).transfer(amount);
     }
 
-    // Add an expense to be split among specified creditors
-    function addExpense(address _payer, string memory _name, address[] calldata _creditor_addresses, uint256 _amount) external onlyOwner isOpen {
+    // Add an expense to be split among specified debtors
+    function addExpense(address _payer, string memory _name, address[] calldata _debtor_addresses, uint256 _amount) external onlyOwner isOpen {
+        require(!isClosed, "Cannot add expense to a closed group");
         require(bytes(_name).length > 0, "Expense name cannot be empty");
         require(_amount > 0, "Expense amount must be greater than 0");
-        require(_creditor_addresses.length > 0, "At least one creditor is required");
+        require(_debtor_addresses.length > 0, "At least one debtor is required");
         require(isMember(_payer), "Payer is not a member");
-        // TODO: ensure that _creditor_addresses are members
+        // TODO: ensure that _debtor_addresses are members
 
         // Create a new expense
         Expense memory newExpense = Expense({
             payer : _payer,
             name : _name,
             amount : _amount,
-            creditor_addresses : _creditor_addresses
+            debtor_addresses : _debtor_addresses
         });
 
         // Add the expense to the expenses mapping
         expenses[expensesLength] = newExpense;
-
         expensesLength++;
 
+        updateDebts(_payer, _debtor_addresses, _amount);
+
         // Emit an event to log the expense
-        emit ExpenseAdded(expensesLength, _payer, _amount, _name, _creditor_addresses);
+        emit ExpenseAdded(expensesLength, _payer, _amount, _name, _debtor_addresses);
+    }
+
+    function updateDebts(address _payer, address[] calldata _debtor_addresses, uint256 _amount) internal {
+        uint256 share = _amount / _debtor_addresses.length;
+        // updates the debts mapping
+        // try to optimize sums and debts by checking if debtor owes money to payer
+        for (uint256 i = 0; i < _debtor_addresses.length; i++) {
+            if (_payer == _debtor_addresses[i]) {
+                continue;
+            }
+            address debtor = _debtor_addresses[i];
+            uint256 debtorOwesPayer = debts[debtor][_payer];
+            uint256 payerOwesDebtor = debts[_payer][debtor];
+            if (debtorOwesPayer > 0) {
+                debts[debtor][_payer] += share;
+            } else if (debtorOwesPayer == 0 && payerOwesDebtor == 0) {
+                debts[debtor][_payer] += share;
+            } else if (payerOwesDebtor > 0) {
+                if (payerOwesDebtor >= share) {
+                    // If payer owes money to debtor and debt is greater than share
+                    // subtract from debt
+                    debts[_payer][debtor] -= share;
+                    continue;
+                } else {
+                    // If payer owes money to debtor and debt is less than share
+                    // subtract from debt and add to debt
+                    debts[_payer][debtor] = 0;
+                    debts[debtor][_payer] = share - payerOwesDebtor;
+                }
+            }
+        }
     }
 
     // Get expense by index
     function getExpense(uint256 index) public view returns (Expense memory) {
         require(index < expensesLength, "Expense not found");
         return expenses[index];
+    }
+
+    // Get debt by address to address
+    function getDebt(address debtor, address creditor) public view returns (uint256) {
+        return debts[debtor][creditor];
+    }
+
+    function close() external onlyOwner isOpen {
+        isClosed = true;
+    }
+
+    function settleDebt() external onlyMember view {
+        require(isClosed, "Group is not closed");
+        require(!isSettled, "The group is already settled");
+        require(isMember(msg.sender), "Only active members can call this function");
     }
 
     // Fallback function to receive Ether

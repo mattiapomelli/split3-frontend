@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { ethers, BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useAccount, useNetwork, useSigner } from "wagmi";
 
 import { GroupAbi, GroupBytecode } from "@abis/group";
@@ -28,12 +28,8 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
     async ({ stakeAmount, initialMembers, name }: CreateGroupParams) => {
       if (!address || !signer || !chain) throw new Error("No address");
 
-      console.log("Initial members: ", initialMembers);
-
-      const safe = await deploySafe(signer, initialMembers);
+      const safe = await deploySafe(signer, [...initialMembers, address]);
       const safeAddress = await safe.getAddress();
-
-      console.log("Safe address: ", safeAddress);
 
       // Deploy the contract
       const factory = new ethers.ContractFactory(
@@ -42,10 +38,12 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
         signer,
       );
 
-      const groupContract = await factory.deploy(stakeAmount, initialMembers);
+      const groupContract = await factory.deploy(
+        stakeAmount,
+        initialMembers,
+        safeAddress,
+      );
       await groupContract.deployed();
-
-      console.log("Group address: ", groupContract.address);
 
       const groupId = await createGroup({
         address: groupContract.address,
@@ -55,10 +53,20 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
         name,
       });
 
-      await addUserToGroup({
-        user_address: address.toLowerCase(),
-        group_id: groupId,
-      });
+      await Promise.all([
+        ...initialMembers.map((address) =>
+          addUserToGroup({
+            user_address: address.toLowerCase(),
+            group_id: groupId,
+            status: "inactive",
+          }),
+        ),
+        addUserToGroup({
+          user_address: address.toLowerCase(),
+          group_id: groupId,
+          status: "active",
+        }),
+      ]);
 
       return groupId;
     },

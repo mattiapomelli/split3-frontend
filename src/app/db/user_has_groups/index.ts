@@ -13,3 +13,29 @@ export const addUserToGroup = async (userHasGroup: CreateUserHasGroup) => {
     throw error;
   }
 };
+
+export const updateUserGroupStatus = async (
+  userAddress: string,
+  groupId: number,
+  status: string,
+) => {
+  const { error } = await supabaseClient
+    .from("user_has_group")
+    .update({
+      status,
+    })
+    .eq("user_address", userAddress.toLowerCase())
+    .eq("group_id", groupId)
+    .select("*")
+    .single();
+
+  if (error) {
+    console.error("Error updating user status in group: ", {
+      error,
+      userAddress,
+      groupId,
+      status,
+    });
+    throw error;
+  }
+};

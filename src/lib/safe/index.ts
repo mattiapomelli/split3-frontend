@@ -28,7 +28,7 @@ export const deploySafe = async (
   const safeFactory = await SafeFactory.create({ ethAdapter: ethAdapterOwner });
   const safeAccountConfig: SafeAccountConfig = {
     owners: addresses,
-    threshold: addresses.length / 2 + 1,
+    threshold: addresses.length / 2,
   };
 
   return await safeFactory.deploySafe({
@@ -41,12 +41,12 @@ export const createTransaction = async (
   safeSdkOwner: Safe,
   to: string,
   data: string,
-  amount: string,
+  amount?: string,
 ) => {
   const safeTransactionData: SafeTransactionDataPartial = {
     to,
-    data: "0x",
-    value: ethers.utils.parseUnits(amount, "ether").toString(),
+    data,
+    value: amount ? ethers.utils.parseUnits(amount, "ether").toString() : "0",
   };
   return await safeSdkOwner.createTransaction({ safeTransactionData });
 };
@@ -59,10 +59,9 @@ export const proposeTransaction = async (
   senderAddress: string,
 ) => {
   const safeTxHash = await safeSdkOwner.getTransactionHash(safeTx);
-  const safeService = getSafeService(signerOrProvider);
   // Sign transaction to verify that the transaction is coming from owner 1
   const senderSignature = await safeSdkOwner.signTransactionHash(safeTxHash);
-
+  const safeService = getSafeService(signerOrProvider);
   await safeService.proposeTransaction({
     safeAddress,
     safeTransactionData: safeTx.data,
@@ -70,6 +69,7 @@ export const proposeTransaction = async (
     senderAddress,
     senderSignature: senderSignature.data,
   });
+  return safeTxHash;
 };
 
 export const confirmTransaction = async (

@@ -20,7 +20,7 @@ export interface Database {
           settled: boolean;
         };
         Insert: {
-          amount?: number;
+          amount: number;
           creditor_address: string;
           debtor_address: string;
           group_id: number;
@@ -64,7 +64,9 @@ export interface Database {
           debtor_addresses: string;
           group_id: number | null;
           id: number;
+          status: string;
           title: string | null;
+          tx_hash: string | null;
           user_address: string | null;
         };
         Insert: {
@@ -72,7 +74,9 @@ export interface Database {
           debtor_addresses: string;
           group_id?: number | null;
           id?: number;
+          status?: string;
           title?: string | null;
+          tx_hash?: string | null;
           user_address?: string | null;
         };
         Update: {
@@ -80,7 +84,9 @@ export interface Database {
           debtor_addresses?: string;
           group_id?: number | null;
           id?: number;
+          status?: string;
           title?: string | null;
+          tx_hash?: string | null;
           user_address?: string | null;
         };
         Relationships: [
@@ -102,24 +108,27 @@ export interface Database {
         Row: {
           address: string;
           chain: string;
+          creator_address: string | null;
           id: number;
-          name: string | null;
+          name: string;
           owner: string;
           required_amount: number | null;
         };
         Insert: {
           address: string;
           chain: string;
+          creator_address?: string | null;
           id?: number;
-          name?: string | null;
+          name: string;
           owner: string;
           required_amount?: number | null;
         };
         Update: {
           address?: string;
           chain?: string;
+          creator_address?: string | null;
           id?: number;
-          name?: string | null;
+          name?: string;
           owner?: string;
           required_amount?: number | null;
         };

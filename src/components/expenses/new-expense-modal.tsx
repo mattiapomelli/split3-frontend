@@ -68,9 +68,11 @@ export const NewExpenseModal = ({
 
   const onSubmit = handleSubmit(async ({ amount, ...rest }) => {
     if (!address) return;
-
     createExpense({
       ...rest,
+      payer_address: address,
+      group_contract: group.address,
+      group_owner: group.owner,
       amount: ethers.utils.parseEther(amount),
       debtor_addresses: debtors.join(","),
       group_id: group.id,

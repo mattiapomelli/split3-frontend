@@ -3,6 +3,8 @@ import { useAccount, useEnsName, useSigner } from "wagmi";
 
 import { supabaseClient } from "app/db";
 
+import { updateUserGroupStatus } from "../../app/db/user_has_groups";
+
 import { getGroupContract } from "./get-group-contract";
 
 interface UseCreateRequestOptions {
@@ -36,16 +38,9 @@ export const useJoinGroup = (options?: UseCreateRequestOptions) => {
       const stakeAmount = await groupContract.requiredAmount();
       const tx = await groupContract.join({ value: stakeAmount });
 
-      const { error: error2 } = await supabaseClient
-        .from("user_has_group")
-        .insert({
-          group_id: groupId,
-          user_address: address.toLowerCase(),
-        });
-
-      if (error2) throw error2;
-
       await tx.wait();
+
+      await updateUserGroupStatus(address, groupId, "active");
     },
     {
       onSuccess: options?.onSuccess,
