@@ -27,7 +27,7 @@ export const useCreateGroup = (options?: UseCreateRequestOptions) => {
   return useMutation(
     async ({ stakeAmount, initialMembers, name }: CreateGroupParams) => {
       if (!address || !signer || !chain) throw new Error("No address");
-
+      console.log(initialMembers);
       const safe = await deploySafe(signer, [...initialMembers, address]);
       const safeAddress = await safe.getAddress();
 

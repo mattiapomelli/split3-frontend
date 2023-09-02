@@ -46,7 +46,7 @@ const iconPositionClassname = {
 export interface SelectProps {
   variant?: keyof typeof variantClassname;
   size?: keyof typeof sizeClassname;
-  items: string[];
+  items: { name: string; value: string }[];
   value: string | undefined; // TODO: make this optional
   onValueChange: (value: string) => void;
   label?: string;
@@ -138,7 +138,7 @@ export const Select = ({
             >
               {items.map((item) => (
                 <Listbox.Option
-                  key={item}
+                  key={item.name}
                   className={({ active }) =>
                     cx(
                       `cursor-pointer select-none relative pr-4 flex items-center`,
@@ -149,7 +149,7 @@ export const Select = ({
                       iconPaddingClassname[size],
                     )
                   }
-                  value={item}
+                  value={item.value}
                 >
                   {({ selected }) => (
                     <>
@@ -159,7 +159,7 @@ export const Select = ({
                           selected ? "font-medium" : "font-normal",
                         )}
                       >
-                        {item}
+                        {item.name}
                       </span>
                       {/* Check Icon */}
                       {selected && (

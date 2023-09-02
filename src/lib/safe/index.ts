@@ -114,3 +114,19 @@ export const getTransaction = async (
   const safeService = getSafeService(signerOrProvider);
   return await safeService.getTransaction(txnHash);
 };
+
+export const getOwners = async (
+  safeAddress: string,
+  signerOrProvider: Signer | Provider,
+): Promise<string[]> => {
+  const safeSdkOwner = await getSafe(safeAddress, signerOrProvider);
+  return await safeSdkOwner.getOwners();
+};
+
+export const getSafesByOwner = async (
+  signerOrProvider: Signer | Provider,
+  address: string,
+): Promise<string[]> => {
+  const safeService = getSafeService(signerOrProvider);
+  return (await safeService.getSafesByOwner(address)).safes;
+};
