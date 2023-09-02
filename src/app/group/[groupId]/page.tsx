@@ -18,7 +18,7 @@ import { useGroup } from "@lib/group/use-group";
 import { useJoinGroup } from "@lib/group/use-join-group";
 import { useSetGroupClosed } from "@lib/group/use-set-group-closed";
 import { useConfirmAndExecuteTransaction } from "@lib/safe/use-confirm-and-execute-transaction";
-import { useConfirmTransaction } from "@lib/safe/use-confirm-transaciont";
+import { useConfirmTransaction } from "@lib/safe/use-confirm-transaction";
 import { useExecuteTransaction } from "@lib/safe/use-execute-transaction";
 import { useGetSafeTransaction } from "@lib/safe/use-get-safe-transacion";
 import { GroupWithInfo } from "app/db/types";
@@ -179,16 +179,6 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
       </div>
       <div className="mb-2 mt-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <h2 className="mb-4 text-2xl font-bold">Debts</h2>
-
-        {!group.closed && currentUserStatus === "active" && (
-          <Button
-            onClick={onCloseGroup}
-            loading={isLoading}
-            disabled={isLoading}
-          >
-            Close debts
-          </Button>
-        )}
         <div>
           {!group.closed && currentUserStatus === "active" && (
             <div>

@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useSigner } from "wagmi";
 
-import { useConfirmTransaction } from "./use-confirm-transaciont";
+import { useConfirmTransaction } from "./use-confirm-transaction";
 import { useExecuteTransaction } from "./use-execute-transaction";
 
 interface CreateGroupParams {

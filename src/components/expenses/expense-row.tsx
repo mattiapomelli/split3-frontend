@@ -9,7 +9,7 @@ import { Address } from "@components/address";
 import { Button } from "@components/basic/button";
 import { useSyncGroupDebts } from "@lib/debt/use-sync-debts";
 import { useConfirmAndExecuteTransaction } from "@lib/safe/use-confirm-and-execute-transaction";
-import { useConfirmTransaction } from "@lib/safe/use-confirm-transaciont";
+import { useConfirmTransaction } from "@lib/safe/use-confirm-transaction";
 import { useExecuteTransaction } from "@lib/safe/use-execute-transaction";
 import { useGetSafeTransaction } from "@lib/safe/use-get-safe-transacion";
 import { GroupExpense, GroupWithMembers } from "app/db/types";
