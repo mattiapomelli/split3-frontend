@@ -5,6 +5,7 @@ import { useAccount } from "wagmi";
 
 import { Address } from "@components/address";
 import { Button } from "@components/basic/button";
+import { usePayDebtPaymentRequest } from "@lib/debt/use-pay-debt-payment-request";
 import { useRequestDebtPayment } from "@lib/debt/use-request-debt-payment";
 import { Debt } from "app/db/types";
 
@@ -23,8 +24,17 @@ export const DebtRow = ({ debt, className }: ExpenseRowProps) => {
       onSuccess() {},
     });
 
+  const { mutate: payDebtPaymentRequest, isLoading: isPayLoading } =
+    usePayDebtPaymentRequest();
+
   const onRequestDebtPayment = () => {
     requestPayment({
+      debt,
+    });
+  };
+
+  const onPayDebtPaymentRequest = () => {
+    payDebtPaymentRequest({
       debt,
     });
   };
@@ -43,40 +53,49 @@ export const DebtRow = ({ debt, className }: ExpenseRowProps) => {
         </p>
       ) : (
         <p>
-          You owe <Address address={debt.debtor_address as `0x${string}`} />{" "}
+          You owe <Address address={debt.creditor_address as `0x${string}`} />{" "}
           <span className="font-medium">{debt.amount} USDC</span>
         </p>
       )}
 
       {/* TODO: show this only if the group is closed */}
       {userIsOwed ? (
-        <>
-          {debt.request_id ? (
-            <div>
-              You requested the payment
-              <Button>See Request</Button>
-            </div>
+        <div>
+          {debt.settled ? (
+            <p>You got repaid</p>
           ) : (
-            <Button
-              onClick={() => onRequestDebtPayment()}
-              loading={isRequestLoading}
-              disabled={isRequestLoading}
-            >
-              Request payment
-            </Button>
+            <div>
+              {debt.request_id ? (
+                <p>You requested the payment </p>
+              ) : (
+                <Button
+                  onClick={() => onRequestDebtPayment()}
+                  loading={isRequestLoading}
+                  disabled={isRequestLoading}
+                >
+                  Request payment
+                </Button>
+              )}
+            </div>
           )}
-        </>
+        </div>
       ) : (
-        <>
-          {debt.request_id ? (
-            <div>
-              You have been requested a payment
-              <Button>See Request</Button>
-            </div>
+        <div>
+          {debt.settled ? (
+            <p>You paid the debt</p>
           ) : (
-            <Button>Settle debt</Button>
+            <div>
+              {debt.request_id && <p>You have been requested a payment </p>}
+              <Button
+                onClick={onPayDebtPaymentRequest}
+                loading={isPayLoading}
+                disabled={isPayLoading}
+              >
+                Settle debt
+              </Button>
+            </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

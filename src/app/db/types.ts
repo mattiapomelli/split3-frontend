@@ -20,7 +20,7 @@ export interface Database {
           settled: boolean;
         };
         Insert: {
-          amount?: number;
+          amount: number;
           creditor_address: string;
           debtor_address: string;
           group_id: number;
