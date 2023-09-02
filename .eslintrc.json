@@ -32,25 +32,5 @@
         "case": "kebabCase"
       }
     ]
-  },
-  "overrides": [
-    {
-      "files": ["./src/**/*.ts", "./src/**/*.tsx"],
-      "rules": {
-        "import/no-default-export": "error"
-      }
-    },
-    {
-      "files": ["./src/**/*.stories.tsx"],
-      "rules": {
-        "import/no-default-export": "off"
-      }
-    },
-    {
-      "files": ["./src/pages/**/*.ts", "./src/pages/**/*.tsx"],
-      "rules": {
-        "import/no-default-export": "off"
-      }
-    }
-  ]
+  }
 }
