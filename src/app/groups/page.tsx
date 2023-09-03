@@ -15,8 +15,8 @@ export default function Home() {
 
   return (
     <div className="mt-4">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="mb-4 text-2xl font-bold">Groups</h3>
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="text-2xl font-bold">Groups</h3>
         <Link href={"/new"}>
           <Button>New Group</Button>
         </Link>
@@ -27,24 +27,38 @@ export default function Home() {
           <Spinner className="h-5 w-5" />
         </div>
       ) : (
-        <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
-          {groups?.map((group) => (
-            <GroupCard key={group.id} group={group} className="flex-1" />
-          ))}
-        </div>
+        <>
+          {!groups?.length && (
+            <div className="rounded-box mt-6 border border-base-300 py-14 text-center">
+              No groups yet
+            </div>
+          )}
+          <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
+            {groups?.map((group) => (
+              <GroupCard key={group.id} group={group} className="flex-1" />
+            ))}
+          </div>
+        </>
       )}
 
-      <h3 className="mb-4 mt-8 text-2xl font-bold">Invitations</h3>
+      <h3 className="mt-8 text-2xl font-bold">Invitations</h3>
       {isLoadingInvited ? (
         <div className="flex justify-center py-10">
           <Spinner className="h-5 w-5" />
         </div>
       ) : (
-        <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
-          {invitedGroups?.map((group) => (
-            <GroupCard key={group.id} group={group} className="flex-1" />
-          ))}
-        </div>
+        <>
+          {!invitedGroups?.length && (
+            <div className="rounded-box mt-6 border border-base-300 py-14 text-center">
+              No invitations yet
+            </div>
+          )}
+          <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
+            {invitedGroups?.map((group) => (
+              <GroupCard key={group.id} group={group} className="flex-1" />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

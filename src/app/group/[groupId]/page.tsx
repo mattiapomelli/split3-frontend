@@ -143,7 +143,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
   };
 
   return (
-    <div>
+    <div className="mt-4">
       <div className="flex flex-col justify-between gap-4 md:flex-row">
         <div>
           <div className="mb-4 flex flex-col gap-x-2 gap-y-4 sm:flex-row sm:items-center">
@@ -185,7 +185,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
             </Fragment>
           ))}
           <br />
-          {balance && (
+          {balance !== undefined && (
             <span className="font-bold">
               Balance: <span className="font-normal">{balance} $ETH</span>
             </span>

@@ -15,8 +15,8 @@ import type { Metadata } from "next";
 const font = Kumbh_Sans({ subsets: ["latin"] });
 
 export const siteConfig = {
-  name: "My dApp",
-  description: "This is my dApp",
+  name: "Split3",
+  description: "Split expenses in groups",
   url: "https://localhost:3000",
   ogImage: "https://localhost:3000/og.jpg",
 };
