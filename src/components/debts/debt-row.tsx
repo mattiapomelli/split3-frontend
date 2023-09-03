@@ -101,7 +101,16 @@ export const DebtRow = ({
           {shouldShowRequestButton && userIsOwed ? (
             <div>
               {debt.settled ? (
-                <p>You got repaid</p>
+                <p>
+                  You got repaid -{" "}
+                  <span
+                    className="text-primary hover:underline"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    {" "}
+                    see request{" "}
+                  </span>{" "}
+                </p>
               ) : (
                 <div>
                   {debt.request_id ? (
@@ -131,7 +140,16 @@ export const DebtRow = ({
           ) : (
             <div>
               {debt.settled ? (
-                <p>You paid the debt</p>
+                <p>
+                  You paid the debt -
+                  <span
+                    className="text-primary hover:underline"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    {" "}
+                    see request{" "}
+                  </span>{" "}
+                </p>
               ) : (
                 <div className="flex items-center justify-end gap-2">
                   {debt.request_id && (
