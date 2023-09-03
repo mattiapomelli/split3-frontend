@@ -16,9 +16,16 @@ export const Hero = () => {
         interaction that in-person education provides. Lenschool bring social
         elements to online education. */}
       </p>
-      <Link href="/new">
-        <Button size="lg">Create a group</Button>
-      </Link>
+      <div className="flex gap-2">
+        <Link href="/groups">
+          <Button size="lg" variant="outline">
+            See your groups
+          </Button>
+        </Link>
+        <Link href="/new">
+          <Button size="lg">Create a group</Button>
+        </Link>
+      </div>
     </section>
   );
 };

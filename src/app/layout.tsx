@@ -16,7 +16,7 @@ const font = Kumbh_Sans({ subsets: ["latin"] });
 
 export const siteConfig = {
   name: "Split3",
-  description: "Manage your group expenses w/ crypto",
+  description: "Split expenses in groups",
   url: "https://localhost:3000",
   ogImage: "https://localhost:3000/og.jpg",
 };

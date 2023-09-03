@@ -28,7 +28,7 @@ export const FeaturesSection = () => {
   return (
     <section className="flex flex-col items-center gap-10 py-32">
       <h3 className="max-w-[30rem] text-center text-3xl font-bold">
-        Everything you need to manage your
+        Everything you need to manage your{" "}
         <span className="text-primary">group expenses</span>
       </h3>
       {/* <p className="max-w-[30rem] text-center text-lg text-base-content-neutral">
