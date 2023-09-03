@@ -1,10 +1,12 @@
 "use client";
 
 import cx from "classnames";
+import { useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Address } from "@components/address";
 import { Button } from "@components/basic/button";
+import { RequestModal } from "@components/request-modal";
 import { usePayDebtPaymentRequest } from "@lib/debt/use-pay-debt-payment-request";
 import { useRequestDebtPayment } from "@lib/debt/use-request-debt-payment";
 import { useSettleDebt } from "@lib/debt/use-settle-debt";
@@ -25,6 +27,7 @@ export const DebtRow = ({
   onSuccess,
   shouldShowRequestButton,
 }: ExpenseRowProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { address } = useAccount();
 
   const userIsOwed = debt.creditor_address === address?.toLowerCase();
@@ -102,7 +105,17 @@ export const DebtRow = ({
               ) : (
                 <div>
                   {debt.request_id ? (
-                    <p>You requested the payment </p>
+                    <p>
+                      You
+                      <span
+                        className="text-primary hover:underline"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        {" "}
+                        requested{" "}
+                      </span>
+                      the payment{" "}
+                    </p>
                   ) : (
                     <Button
                       onClick={() => onRequestDebtPayment()}
@@ -120,8 +133,20 @@ export const DebtRow = ({
               {debt.settled ? (
                 <p>You paid the debt</p>
               ) : (
-                <div>
-                  {debt.request_id && <p>You have been requested a payment </p>}
+                <div className="flex items-center justify-end gap-2">
+                  {debt.request_id && (
+                    <p>
+                      You have been{" "}
+                      <span
+                        className="text-primary hover:underline"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        {" "}
+                        requested{" "}
+                      </span>{" "}
+                      a payment{" "}
+                    </p>
+                  )}
                   {shouldShowRequestButton && (
                     <Button
                       onClick={onPayDebt}
@@ -137,6 +162,11 @@ export const DebtRow = ({
           )}
         </>
       )}
+      <RequestModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        requestId={debt.request_id || ""}
+      />
     </div>
   );
 };

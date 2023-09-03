@@ -15,6 +15,7 @@ interface CreateRequestParams {
   receiverAddress: string;
   amount: string;
   reason: string;
+  signer: string;
 }
 
 const getCreateRequestParameters = ({
@@ -22,6 +23,7 @@ const getCreateRequestParameters = ({
   receiverAddress,
   amount,
   reason,
+  signer,
 }: CreateRequestParams): Types.ICreateRequestParameters => {
   return {
     requestInfo: {
@@ -73,7 +75,7 @@ const getCreateRequestParameters = ({
     // The identity that signs the request, either payee or payer identity.
     signer: {
       type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
-      value: payerAddress,
+      value: signer,
     },
   };
 };
@@ -91,6 +93,7 @@ export const useCreateRequest = (options?: UseCreateRequestOptions) => {
       receiverAddress,
       payerAddress,
       reason,
+      signer,
     }: CreateRequestParams) => {
       if (!address) throw new Error("No address");
 
@@ -99,6 +102,7 @@ export const useCreateRequest = (options?: UseCreateRequestOptions) => {
         receiverAddress,
         amount,
         reason,
+        signer,
       });
 
       const requestClient = getRequestClient();

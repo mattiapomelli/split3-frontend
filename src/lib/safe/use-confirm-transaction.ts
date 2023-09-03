@@ -24,7 +24,7 @@ export const useConfirmTransaction = (options?: UseCreateRequestOptions) => {
 
       toast({
         title: "MultiSig Transaction Confirmation",
-        description: `Confirming transaction - ${transaction?.confirmations?.length} / ${transaction?.confirmationsRequired}} Signatures`,
+        description: `Confirming transaction - ${transaction?.confirmations?.length} / ${transaction?.confirmationsRequired} Signatures`,
         type: "loading",
       });
 

@@ -274,6 +274,7 @@ const GroupPageInner = ({ group, onSuccess }: GroupPageInnerProps) => {
           <Button
             rightIcon={<PlusIcon className="h-5 w-5" />}
             onClick={() => setNewExpenseModalOpen(true)}
+            disabled={group.closed}
           >
             New Expense
           </Button>

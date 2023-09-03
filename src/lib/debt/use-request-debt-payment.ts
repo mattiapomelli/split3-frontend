@@ -24,6 +24,7 @@ export const useRequestDebtPayment = (options?: UseCreateRequestOptions) => {
         receiverAddress: debt.creditor_address,
         reason: `Request of payment of debt of group ${groupName}`,
         payerAddress: debt.debtor_address,
+        signer: address,
       });
 
       const { error } = await supabaseClient

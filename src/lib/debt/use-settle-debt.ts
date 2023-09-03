@@ -26,6 +26,7 @@ export const useSettleDebt = (options?: UseCreateRequestOptions) => {
         receiverAddress: debt.creditor_address,
         reason: `Spontaneous payment of debt of group ${groupName}`,
         payerAddress: debt.debtor_address,
+        signer: address,
       });
 
       await payRequest({
