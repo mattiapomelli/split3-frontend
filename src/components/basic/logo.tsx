@@ -1,18 +1,16 @@
-import cx from "classnames";
+import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
 export interface LogoProps {
   href?: string;
   className?: string;
 }
 
-export const Logo = ({ href = "/", className }: LogoProps) => {
+export const Logo = ({ href = "/" }: LogoProps) => {
   return (
     <Link href={href} className="flex items-center gap-3">
-      <span className="block h-7 w-7 rounded-full bg-primary" />
-      <span className={cx("font-black text-xl hidden sm:block", className)}>
-        Split3
-      </span>
+      <Image src="/logo.png" alt="Split3" width="100" height="43" />
     </Link>
   );
 };
